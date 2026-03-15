@@ -7,6 +7,7 @@ export interface IGasto extends Document {
   date: Date;
   payment_method: 'CARTAO' | 'PIX' | 'DINHEIRO';
   installments?: number;
+  userId: mongoose.Types.ObjectId | string;
 }
 
 const GastoSchema: Schema = new Schema({
@@ -41,6 +42,11 @@ const GastoSchema: Schema = new Schema({
     default: 1,
     min: [1, 'At least 1 installment is required.'],
   },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'A Gasto must belong to a user.'],
+  }
 }, { 
   timestamps: true // Adds createdAt and updatedAt timestamps
 });

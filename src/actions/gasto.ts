@@ -3,9 +3,24 @@
 import dbConnect from '@/lib/mongoose';
 import Gasto from '@/models/Gasto';
 import { revalidatePath } from 'next/cache';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function createGasto(prevState: any, formData: FormData) {
   try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session || !session.user?.email) {
+      throw new Error("You must be logged in to create an expense.");
+    }
+    
+    // We already retrieve User._id into session.user.id in the NextAuth configuration
+    const userId = (session.user as any).id;
+
+    if (!userId) {
+       throw new Error("User ID could not be found.");
+    }
+
     await dbConnect();
 
     const name = formData.get('name') as string;
@@ -25,12 +40,13 @@ export async function createGasto(prevState: any, formData: FormData) {
       payment_method,
       installments,
       description,
+      userId,
     });
 
     await newGasto.save();
     
-    // Invalidate the cache for the home page so new data appears (if we list it later)
-    revalidatePath('/');
+    // Invalidate the cache for the dashboard page so new data appears
+    revalidatePath('/dashboard');
     
     return { success: true, message: 'Expense added successfully!' };
   } catch (error: any) {
