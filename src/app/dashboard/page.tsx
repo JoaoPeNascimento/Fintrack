@@ -1,8 +1,10 @@
 import GastoForm from '@/components/GastoForm';
 import LogoutButton from '@/components/LogoutButton';
+import ExpenseTable from '@/components/ExpenseTable';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getUserGastos } from '@/actions/gasto';
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -10,6 +12,9 @@ export default async function DashboardPage() {
   if (!session) {
     redirect('/');
   }
+
+  const gastosData = await getUserGastos();
+  const gastos = gastosData.success ? gastosData.data : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
@@ -47,13 +52,24 @@ export default async function DashboardPage() {
       <main className="flex flex-col items-center justify-center p-6 mt-4 sm:mt-10">
         <div className="w-full max-w-lg bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 p-8 sm:p-10">
           <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-2">
-          Adicionar Gasto
-        </h1>
-        <p className="text-gray-500 mb-8 font-medium">
-          Registre uma nova despesa no seu gerenciador financeiro.
-        </p>
+            Adicionar Gasto
+          </h1>
+          <p className="text-gray-500 mb-8 font-medium">
+            Registre uma nova despesa no seu gerenciador financeiro.
+          </p>
 
-        <GastoForm />
+          <GastoForm />
+        </div>
+
+        {/* Expenses List */}
+        <div className="w-full max-w-4xl bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 p-8 sm:p-10 mt-8">
+          <h2 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-2">
+            Meus Gastos
+          </h2>
+          <p className="text-gray-500 mb-6 font-medium">
+            Acompanhe o histórico das suas despesas.
+          </p>
+          <ExpenseTable gastos={gastos} />
         </div>
       </main>
     </div>

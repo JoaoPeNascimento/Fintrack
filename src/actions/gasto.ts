@@ -54,3 +54,38 @@ export async function createGasto(prevState: any, formData: FormData) {
     return { success: false, message: error.message || 'Failed to create expense.' };
   }
 }
+
+export async function getUserGastos() {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session || !session.user?.email) {
+      return { success: false, data: [] };
+    }
+    
+    const userId = (session.user as any).id;
+    if (!userId) {
+      return { success: false, data: [] };
+    }
+
+    await dbConnect();
+
+    // Fetch and sort by date descending
+    const gastos = await Gasto.find({ userId }).sort({ date: -1 }).lean();
+
+    const plainGastos = gastos.map((g: any) => ({
+      _id: g._id?.toString(),
+      name: g.name,
+      value: g.value,
+      date: g.date ? g.date.toISOString() : null,
+      payment_method: g.payment_method,
+      installments: g.installments,
+      description: g.description,
+    }));
+
+    return { success: true, data: plainGastos };
+  } catch (error: any) {
+    console.error('Error fetching Gastos:', error);
+    return { success: false, data: [] };
+  }
+}
