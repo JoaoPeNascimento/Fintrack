@@ -26,26 +26,26 @@ export default function GastoForm() {
   }, [state]);
 
   return (
-    <form ref={formRef} action={formAction} className="space-y-6">
-      
-      {/* Nome */}
-      <div>
-        <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-1">
-          Nome da Despesa
-        </label>
-        <input
-          type="text"
-          name="name"
-          id="name"
-          placeholder="Ex: Supermercado"
-          required
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none bg-white/50 text-gray-900 placeholder:text-gray-500"
-        />
-      </div>
+    <form ref={formRef} action={formAction} className="flex flex-col gap-4">
+      {/* First Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
+        {/* Nome */}
+        <div className="lg:col-span-4">
+          <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-1">
+            Nome da Despesa
+          </label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Ex: Supermercado"
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none bg-white/50 text-gray-900 placeholder:text-gray-500"
+          />
+        </div>
 
-      {/* Valor & Data (Grid) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div>
+        {/* Valor */}
+        <div className="lg:col-span-2">
           <label htmlFor="value" className="block text-sm font-semibold text-gray-700 mb-1">
             Valor (R$)
           </label>
@@ -60,7 +60,9 @@ export default function GastoForm() {
             className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none bg-white/50 text-gray-900 placeholder:text-gray-500"
           />
         </div>
-        <div>
+
+        {/* Data */}
+        <div className="lg:col-span-2">
           <label htmlFor="date" className="block text-sm font-semibold text-gray-700 mb-1">
             Data
           </label>
@@ -73,13 +75,11 @@ export default function GastoForm() {
             className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none bg-white/50 text-gray-900 placeholder:text-gray-500"
           />
         </div>
-      </div>
 
-      {/* Forma de Pagamento & Parcelas (Grid) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div>
+        {/* Forma de Pagamento */}
+        <div className="lg:col-span-2">
           <label htmlFor="payment_method" className="block text-sm font-semibold text-gray-700 mb-1">
-            Forma de Pagamento
+            Pagamento
           </label>
           <select
             name="payment_method"
@@ -92,7 +92,9 @@ export default function GastoForm() {
             <option value="DINHEIRO">Dinheiro</option>
           </select>
         </div>
-        <div>
+
+        {/* Parcelas */}
+        <div className="lg:col-span-2">
           <label htmlFor="installments" className="block text-sm font-semibold text-gray-700 mb-1">
             Parcelas
           </label>
@@ -107,29 +109,33 @@ export default function GastoForm() {
         </div>
       </div>
 
-      {/* Descrição */}
-      <div>
-        <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-1">
-          Descrição do Gasto (Opcional)
-        </label>
-        <textarea
-          name="description"
-          id="description"
-          rows={3}
-          placeholder="Adicione mais detalhes sobre essa despesa..."
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none bg-white/50 text-gray-900 placeholder:text-gray-500 resize-y"
-        ></textarea>
+      {/* Second Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+        {/* Descrição */}
+        <div className="lg:col-span-9">
+          <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-1">
+            Descrição do Gasto (Opcional)
+          </label>
+          <input
+            type="text"
+            name="description"
+            id="description"
+            placeholder="Adicione mais detalhes sobre essa despesa..."
+            className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none bg-white/50 text-gray-900 placeholder:text-gray-500"
+          />
+        </div>
+
+        {/* Botão de Envio */}
+        <div className="lg:col-span-3">
+          <button
+            type="submit"
+            disabled={isPending}
+            className="w-full h-[50px] bg-gradient-to-r from-indigo-600 hover:from-indigo-700 to-purple-600 hover:to-purple-700 text-white font-bold px-4 rounded-xl shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/50 transition-all disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.98] flex items-center justify-center"
+          >
+            {isPending ? 'Registrando...' : 'Registrar Gasto'}
+          </button>
+        </div>
       </div>
-
-      {/* Botão de Envio */}
-      <button
-        type="submit"
-        disabled={isPending}
-        className="w-full bg-gradient-to-r from-indigo-600 hover:from-indigo-700 to-purple-600 hover:to-purple-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/50 transition-all disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.98]"
-      >
-        {isPending ? 'Registrando...' : 'Registrar Gasto'}
-      </button>
-
     </form>
   );
 }
