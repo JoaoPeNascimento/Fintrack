@@ -1,5 +1,9 @@
 'use client';
 
+import { useTransition } from 'react';
+import { deleteGasto } from '@/actions/gasto';
+import toast from 'react-hot-toast';
+
 type Gasto = {
   _id: string;
   name: string;
@@ -11,6 +15,20 @@ type Gasto = {
 };
 
 export default function ExpenseTable({ gastos }: { gastos: Gasto[] }) {
+  const [isPending, startTransition] = useTransition();
+
+  const handleDelete = (id: string) => {
+    if (!window.confirm('Tem certeza que deseja excluir esta despesa?')) return;
+
+    startTransition(async () => {
+      const res = await deleteGasto(id);
+      if (res.success) {
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+    });
+  };
   if (!gastos || gastos.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-gray-500">
@@ -33,6 +51,7 @@ export default function ExpenseTable({ gastos }: { gastos: Gasto[] }) {
             <th className="py-4 px-4 font-semibold text-indigo-800 text-sm w-32 text-right">Valor</th>
             <th className="py-4 px-4 font-semibold text-indigo-800 text-sm w-40 text-center">Forma de Pagamento</th>
             <th className="py-4 px-4 font-semibold text-indigo-800 text-sm w-24 text-center">Parcelas</th>
+            <th className="py-4 px-4 font-semibold text-indigo-800 text-sm w-16 text-center">Ações</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
@@ -63,6 +82,20 @@ export default function ExpenseTable({ gastos }: { gastos: Gasto[] }) {
               </td>
               <td className="py-4 px-4 text-sm text-center text-gray-600 font-medium">
                 {gasto.installments ? `${gasto.installments}x` : '1x'}
+              </td>
+              <td className="py-4 px-4 text-center">
+                <button
+                  onClick={() => handleDelete(gasto._id)}
+                  disabled={isPending}
+                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                  title="Excluir despesa"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                  </svg>
+                </button>
               </td>
             </tr>
           ))}

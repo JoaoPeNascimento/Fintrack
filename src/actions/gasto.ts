@@ -195,3 +195,34 @@ export async function getExpensesByMonthAndYear(month: number, year: number) {
     return { success: false, data: [] };
   }
 }
+
+export async function deleteGasto(id: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session || !session.user?.email) {
+      return { success: false, message: 'Não autorizado.' };
+    }
+    
+    const userId = (session.user as any).id;
+    if (!userId) {
+      return { success: false, message: 'Usuário não encontrado.' };
+    }
+
+    await dbConnect();
+
+    const result = await Gasto.deleteOne({ _id: id, userId });
+
+    if (result.deletedCount === 0) {
+      return { success: false, message: 'Gasto não encontrado ou não autorizado.' };
+    }
+
+    revalidatePath('/dashboard');
+    revalidatePath('/profile');
+
+    return { success: true, message: 'Gasto excluído com sucesso!' };
+  } catch (error: any) {
+    console.error('Error deleting Gasto:', error);
+    return { success: false, message: error.message || 'Erro ao excluir gasto.' };
+  }
+}
