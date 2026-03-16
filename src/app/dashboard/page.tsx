@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getUserGastos } from '@/actions/gasto';
+import Link from 'next/link';
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -21,7 +22,7 @@ export default async function DashboardPage() {
       
       {/* Header Navbar */}
       <header className="w-full px-6 py-4 bg-white/60 backdrop-blur-md border-b border-white/50 shadow-sm flex items-center justify-between sticky top-0 z-10">
-        <div className="flex items-center gap-4">
+        <Link href="/profile" className="flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer">
           {session.user?.image ? (
             <img 
               src={session.user.image} 
@@ -39,11 +40,11 @@ export default async function DashboardPage() {
             <span className="text-sm font-bold text-gray-800 leading-tight">
               {session.user?.name}
             </span>
-            <span className="text-xs text-gray-500 font-medium">
-              Minha Conta
+            <span className="text-xs text-indigo-500 font-medium hover:underline">
+              Ver Perfil
             </span>
           </div>
-        </div>
+        </Link>
         
         <LogoutButton />
       </header>
