@@ -1,7 +1,7 @@
 'use client';
 
 import { createGasto } from '@/actions/gasto';
-import { useRef, useActionState, useEffect } from 'react';
+import { useRef, useActionState, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 // Initial state for the action
@@ -14,11 +14,14 @@ export default function GastoForm() {
   const [state, formAction, isPending] = useActionState(createGasto, initialState);
   const formRef = useRef<HTMLFormElement>(null);
 
+    const [paymentMethod, setPaymentMethod] = useState('CARTAO');
+
   useEffect(() => {
     if (state?.message) {
       if (state.success) {
         toast.success(state.message);
         formRef.current?.reset();
+        setPaymentMethod('CARTAO'); // Reset state on success
       } else {
         toast.error(state.message);
       }
@@ -77,13 +80,15 @@ export default function GastoForm() {
         </div>
 
         {/* Forma de Pagamento */}
-        <div className="lg:col-span-2">
+        <div className={paymentMethod === 'CARTAO' ? "lg:col-span-2" : "lg:col-span-4"}>
           <label htmlFor="payment_method" className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
             Pagamento
           </label>
           <select
             name="payment_method"
             id="payment_method"
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
             required
             className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all outline-none bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E')] dark:bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px_12px] bg-[position:right_1rem_center] bg-no-repeat pr-10"
           >
@@ -94,19 +99,21 @@ export default function GastoForm() {
         </div>
 
         {/* Parcelas */}
-        <div className="lg:col-span-2">
-          <label htmlFor="installments" className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
-            Parcelas
-          </label>
-          <input
-            type="number"
-            name="installments"
-            id="installments"
-            min="1"
-            defaultValue="1"
-            className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all outline-none bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
-          />
-        </div>
+        {paymentMethod === 'CARTAO' && (
+          <div className="lg:col-span-2">
+            <label htmlFor="installments" className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
+              Parcelas
+            </label>
+            <input
+              type="number"
+              name="installments"
+              id="installments"
+              min="1"
+              defaultValue="1"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all outline-none bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+            />
+          </div>
+        )}
       </div>
 
       {/* Second Row */}
