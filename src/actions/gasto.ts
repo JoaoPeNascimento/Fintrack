@@ -70,14 +70,41 @@ export async function getUserGastos() {
 
     await dbConnect();
 
-    // Fetch and sort by date descending
-    const gastos = await Gasto.find({ userId }).sort({ date: -1 }).lean();
+    // Fetch all for user and sort by date descending
+    const allGastos = await Gasto.find({ userId }).sort({ date: -1 }).lean();
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+
+    const gastos = allGastos.filter((g: any) => {
+      if (!g.date) return false;
+      
+      const gDate = new Date(g.date);
+      const gYear = gDate.getFullYear();
+      const gMonth = gDate.getMonth();
+
+      // Gastos do mês atual (ou futuros)
+      if (gYear > currentYear || (gYear === currentYear && gMonth >= currentMonth)) {
+        return true;
+      }
+
+      // Gastos de meses anteriores com > 1 parcela
+      if (g.installments && g.installments > 1) {
+        const monthsPassed = (currentYear - gYear) * 12 + (currentMonth - gMonth);
+        // Só continua aparecendo se o número de meses que se passaram 
+        // for menor que o total de parcelas
+        return monthsPassed < g.installments;
+      }
+
+      return false;
+    });
 
     const plainGastos = gastos.map((g: any) => ({
       _id: g._id?.toString(),
       name: g.name,
       value: g.value,
-      date: g.date ? g.date.toISOString() : null,
+      date: g.date ? new Date(g.date).toISOString() : null,
       payment_method: g.payment_method,
       installments: g.installments,
       description: g.description,
