@@ -14,7 +14,7 @@ type Gasto = {
   description?: string;
 };
 
-export default function ExpenseTable({ gastos }: { gastos: Gasto[] }) {
+export default function ExpenseTable({ gastos, onEdit }: { gastos: Gasto[]; onEdit?: (gasto: Gasto) => void }) {
   const [isPending, startTransition] = useTransition();
 
   const handleDelete = (id: string) => {
@@ -84,22 +84,47 @@ export default function ExpenseTable({ gastos }: { gastos: Gasto[] }) {
                 {gasto.installments ? `${gasto.installments}x` : '1x'}
               </td>
               <td className="py-4 px-4 text-center">
-                <button
-                  onClick={() => handleDelete(gasto._id)}
-                  disabled={isPending}
-                  className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
-                  title="Excluir despesa"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 6h18"></path>
-                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                  </svg>
-                </button>
+                <div className="flex justify-center gap-2">
+                  <button
+                    onClick={() => onEdit && onEdit(gasto)}
+                    className="p-2 text-indigo-400 dark:text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
+                    title="Editar despesa"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 20h9"></path>
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => handleDelete(gasto._id)}
+                    disabled={isPending}
+                    className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                    title="Excluir despesa"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 6h18"></path>
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
         </tbody>
+        <tfoot className="border-t-2 border-indigo-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30">
+          <tr>
+            <td colSpan={2} className="py-4 px-4 text-indigo-900 dark:text-indigo-200 font-bold text-sm">
+              Total ({gastos.length} {gastos.length === 1 ? 'gasto registrado' : 'gastos registrados'})
+            </td>
+            <td className="py-4 px-4 text-right whitespace-nowrap">
+              <span className="font-bold text-red-600 dark:text-red-400 text-sm">
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gastos.reduce((acc, gasto) => acc + gasto.value, 0))}
+              </span>
+            </td>
+            <td colSpan={3}></td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   );

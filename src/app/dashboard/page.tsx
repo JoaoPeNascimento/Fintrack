@@ -1,10 +1,10 @@
-import GastoForm from '@/components/GastoForm';
+import DashboardClient from '@/components/DashboardClient';
 import LogoutButton from '@/components/LogoutButton';
-import ExpenseTable from '@/components/ExpenseTable';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getUserGastos } from '@/actions/gasto';
+import { getUserCards } from '@/actions/card';
 import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -17,6 +17,9 @@ export default async function DashboardPage() {
 
   const gastosData = await getUserGastos();
   const gastos = gastosData.success ? gastosData.data : [];
+
+  const cardsData = await getUserCards();
+  const cards = cardsData.success ? cardsData.data : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
@@ -55,28 +58,7 @@ export default async function DashboardPage() {
 
       {/* Main Content */}
       <main className="flex flex-col items-center justify-center p-6 mt-4 sm:mt-8 gap-8 max-w-6xl mx-auto w-full">
-        {/* Form Container */}
-        <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 p-6 sm:p-8 transition-colors duration-300">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-2">
-            Adicionar Gasto
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 mb-6 font-medium">
-            Registre uma nova despesa no seu gerenciador financeiro.
-          </p>
-
-          <GastoForm />
-        </div>
-
-        {/* Expenses List */}
-        <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 p-6 sm:p-8 overflow-hidden transition-colors duration-300">
-          <h2 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-2">
-            Meus Gastos
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-6 font-medium">
-            Acompanhe o histórico das suas despesas.
-          </p>
-          <ExpenseTable gastos={gastos} />
-        </div>
+        <DashboardClient gastos={gastos} cards={cards} />
       </main>
     </div>
   );

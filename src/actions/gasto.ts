@@ -23,32 +23,57 @@ export async function createGasto(prevState: any, formData: FormData) {
 
     await dbConnect();
 
+    const id = formData.get('id') as string;
     const name = formData.get('name') as string;
     const valueStr = formData.get('value') as string;
     const value = parseFloat(valueStr);
     const dateStr = formData.get('date') as string;
     const date = dateStr ? new Date(dateStr) : new Date();
-    const payment_method = formData.get('payment_method') as string;
     const installmentsStr = formData.get('installments') as string;
     const installments = installmentsStr ? parseInt(installmentsStr, 10) : 1;
     const description = formData.get('description') as string;
-
-    const newGasto = new Gasto({
-      name,
-      value,
-      date,
-      payment_method,
-      installments,
-      description,
-      userId,
-    });
-
-    await newGasto.save();
     
-    // Invalidate the cache for the dashboard page so new data appears
-    revalidatePath('/dashboard');
-    
-    return { success: true, message: 'Expense added successfully!' };
+    let payment_method = formData.get('payment_method') as string;
+    let cardId: string | undefined = undefined;
+
+    if (payment_method && payment_method.startsWith('CARD_')) {
+      cardId = payment_method.replace('CARD_', '');
+      payment_method = 'CARTAO';
+    }
+
+    if (id) {
+      await Gasto.updateOne({ _id: id, userId }, {
+        name,
+        value,
+        date,
+        payment_method,
+        installments,
+        description,
+        cardId,
+      });
+      revalidatePath('/dashboard');
+      revalidatePath('/profile');
+      return { success: true, message: 'Gasto atualizado com sucesso!' };
+    } else {
+      const newGasto = new Gasto({
+        name,
+        value,
+        date,
+        payment_method,
+        installments,
+        description,
+        cardId,
+        userId,
+      });
+
+      await newGasto.save();
+      
+      // Invalidate the cache for the dashboard page so new data appears
+      revalidatePath('/dashboard');
+      revalidatePath('/profile');
+      
+      return { success: true, message: 'Gasto registrado com sucesso!' };
+    }
   } catch (error: any) {
     console.error('Error creating Gasto:', error);
     return { success: false, message: error.message || 'Failed to create expense.' };
@@ -108,6 +133,7 @@ export async function getUserGastos() {
       payment_method: g.payment_method,
       installments: g.installments,
       description: g.description,
+      cardId: g.cardId,
     }));
 
     return { success: true, data: plainGastos };
@@ -214,6 +240,7 @@ export async function getExpensesByMonthAndYear(month: number, year: number) {
       payment_method: g.payment_method,
       installments: g.installments,
       description: g.description,
+      cardId: g.cardId,
     }));
 
     return { success: true, data: plainGastos };
