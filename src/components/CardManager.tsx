@@ -66,7 +66,7 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
         toast.success(response.message || "Cartão salvo com sucesso!");
         
         const newCard: CreditCard = {
-          id: response.card._id || response.card.id || Math.random().toString(),
+          id: response.card._id || Math.random().toString(),
           name: response.card.name,
           limit: response.card.limit,
           closingDay: response.card.closingDay,

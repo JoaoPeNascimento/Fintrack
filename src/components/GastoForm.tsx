@@ -17,7 +17,6 @@ type Gasto = {
   date: string | null;
   payment_method: string;
   installments?: number;
-  installments?: number;
   description?: string;
   cardId?: string;
 };
@@ -37,12 +36,22 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
   useEffect(() => {
     if (gastoToEdit && formRef.current) {
       const form = formRef.current;
-      if (form.name && 'value' in form.name) form.name.value = gastoToEdit.name;
-      if (form.value && 'value' in form.value) form.value.value = gastoToEdit.value.toString();
-      if (form.date && 'value' in form.date) form.date.value = gastoToEdit.date ? gastoToEdit.date.split('T')[0] : '';
+      const nameInput = form.elements.namedItem('name') as HTMLInputElement;
+      if (nameInput) nameInput.value = gastoToEdit.name;
+
+      const valueInput = form.elements.namedItem('value') as HTMLInputElement;
+      if (valueInput) valueInput.value = gastoToEdit.value.toString();
+
+      const dateInput = form.elements.namedItem('date') as HTMLInputElement;
+      if (dateInput) dateInput.value = gastoToEdit.date ? gastoToEdit.date.split('T')[0] : '';
+      
       setPaymentMethod(gastoToEdit.payment_method === 'CARTAO' && gastoToEdit.cardId ? `CARD_${gastoToEdit.cardId}` : gastoToEdit.payment_method);
-      if (form.installments && 'value' in form.installments) form.installments.value = (gastoToEdit.installments || 1).toString();
-      if (form.description && 'value' in form.description) form.description.value = gastoToEdit.description || '';
+      
+      const installmentsInput = form.elements.namedItem('installments') as HTMLInputElement;
+      if (installmentsInput) installmentsInput.value = (gastoToEdit.installments || 1).toString();
+      
+      const descInput = form.elements.namedItem('description') as HTMLInputElement;
+      if (descInput) descInput.value = gastoToEdit.description || '';
     } else if (formRef.current) {
       formRef.current.reset();
       setPaymentMethod('PIX');
