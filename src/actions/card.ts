@@ -90,3 +90,80 @@ export async function getUserCards() {
     return { success: false, data: [] };
   }
 }
+
+export async function updateCard(
+  cardId: string,
+  formData: {
+    name: string;
+    limit: number;
+    closingDay: number;
+    dueDay: number;
+    color: string;
+  }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) throw new Error("Acesso negado.");
+    
+    const userId = (session.user as any).id;
+    if (!userId) throw new Error("Acesso negado.");
+
+    await dbConnect();
+
+    const updatedCard = await Card.findOneAndUpdate(
+      { _id: cardId, userId },
+      {
+        name: formData.name,
+        limit: formData.limit,
+        closingDay: formData.closingDay,
+        dueDay: formData.dueDay,
+        color: formData.color,
+      },
+      { new: true }
+    );
+
+    if (!updatedCard) {
+      throw new Error("Cartão não encontrado ou sem permissão para editar.");
+    }
+
+    revalidatePath('/profile');
+
+    const cardData = {
+       _id: updatedCard._id?.toString(),
+       name: updatedCard.name,
+       limit: updatedCard.limit,
+       closingDay: updatedCard.closingDay,
+       dueDay: updatedCard.dueDay,
+       color: updatedCard.color,
+    };
+
+    return { success: true, message: 'Cartão atualizado com sucesso!', card: cardData };
+  } catch (error: any) {
+    console.error('Error updating Card:', error);
+    return { success: false, message: error.message || 'Falha ao atualizar cartão.' };
+  }
+}
+
+export async function deleteCard(cardId: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) throw new Error("Acesso negado.");
+    
+    const userId = (session.user as any).id;
+    if (!userId) throw new Error("Acesso negado.");
+
+    await dbConnect();
+
+    const deletedCard = await Card.findOneAndDelete({ _id: cardId, userId });
+
+    if (!deletedCard) {
+      throw new Error("Cartão não encontrado ou sem permissão para deletar.");
+    }
+
+    revalidatePath('/profile');
+    return { success: true, message: 'Cartão deletado com sucesso!' };
+  } catch (error: any) {
+    console.error('Error deleting Card:', error);
+    return { success: false, message: error.message || 'Falha ao deletar cartão.' };
+  }
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { createCard } from '@/actions/card';
+import { createCard, updateCard, deleteCard } from '@/actions/card';
 import toast from 'react-hot-toast';
 
 // Tipagem básica de um cartão
@@ -29,6 +29,48 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingCardId, setEditingCardId] = useState<string | null>(null);
+
+  const openNewCardModal = () => {
+    setEditingCardId(null);
+    setFormData({ name: '', limit: '', closingDay: '', dueDay: '', color: 'purple' });
+    setIsModalOpen(true);
+  };
+
+  const openEditCardModal = (card: CreditCard) => {
+    setEditingCardId(card.id);
+    setFormData({
+      name: card.name,
+      limit: card.limit.toString(),
+      closingDay: card.closingDay.toString(),
+      dueDay: card.dueDay.toString(),
+      color: card.color,
+    });
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingCardId(null);
+    setFormData({ name: '', limit: '', closingDay: '', dueDay: '', color: 'purple' });
+  };
+
+  const handleDeleteCard = async (cardId: string) => {
+    if (!window.confirm("Certeza que deseja excluir este cartão?")) return;
+    
+    try {
+      const response = await deleteCard(cardId);
+      if (response.success) {
+        toast.success(response.message || "Cartão deletado com sucesso.");
+        setCards(cards.filter(c => c.id !== cardId));
+      } else {
+        toast.error(response.message || "Erro ao deletar cartão.");
+      }
+    } catch (error) {
+      toast.error("Ocorreu um erro inesperado ao deletar.");
+      console.error(error);
+    }
+  };
 
   // Form State
   const [formData, setFormData] = useState({
@@ -44,7 +86,7 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddCard = async (e: React.FormEvent) => {
+  const handleSaveCard = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.limit || !formData.closingDay || !formData.dueDay) {
       toast.error("Por favor, preencha todos os campos obrigatórios.");
@@ -54,39 +96,58 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
     setIsSubmitting(true);
 
     try {
-      const response = await createCard({
-        name: formData.name,
-        limit: parseFloat(formData.limit),
-        closingDay: parseInt(formData.closingDay),
-        dueDay: parseInt(formData.dueDay),
-        color: formData.color,
-      });
-
-      if (response.success && response.card) {
-        toast.success(response.message || "Cartão salvo com sucesso!");
-        
-        const newCard: CreditCard = {
-          id: response.card._id || Math.random().toString(),
-          name: response.card.name,
-          limit: response.card.limit,
-          closingDay: response.card.closingDay,
-          dueDay: response.card.dueDay,
-          color: response.card.color as CardColor,
-        };
-
-        setCards([newCard, ...cards]);
-        setIsModalOpen(false);
-        setFormData({
-          name: '',
-          limit: '',
-          closingDay: '',
-          dueDay: '',
-          color: 'purple',
+      if (editingCardId) {
+        const response = await updateCard(editingCardId, {
+          name: formData.name,
+          limit: parseFloat(formData.limit as string),
+          closingDay: parseInt(formData.closingDay as string),
+          dueDay: parseInt(formData.dueDay as string),
+          color: formData.color,
         });
-        
-        if (!isAccordionOpen) setIsAccordionOpen(true);
+
+        if (response.success && response.card) {
+          toast.success(response.message || "Cartão atualizado com sucesso!");
+          
+          setCards(cards.map(c => c.id === editingCardId ? {
+            id: response.card._id || Math.random().toString(),
+            name: response.card.name,
+            limit: response.card.limit,
+            closingDay: response.card.closingDay,
+            dueDay: response.card.dueDay,
+            color: response.card.color as CardColor,
+          } : c));
+          closeModal();
+        } else {
+          toast.error(response.message || "Erro ao atualizar cartão.");
+        }
       } else {
-        toast.error(response.message || "Erro ao salvar cartão.");
+        const response = await createCard({
+          name: formData.name,
+          limit: parseFloat(formData.limit as string),
+          closingDay: parseInt(formData.closingDay as string),
+          dueDay: parseInt(formData.dueDay as string),
+          color: formData.color,
+        });
+
+        if (response.success && response.card) {
+          toast.success(response.message || "Cartão salvo com sucesso!");
+          
+          const newCard: CreditCard = {
+            id: response.card._id || Math.random().toString(),
+            name: response.card.name,
+            limit: response.card.limit,
+            closingDay: response.card.closingDay,
+            dueDay: response.card.dueDay,
+            color: response.card.color as CardColor,
+          };
+
+          setCards([newCard, ...cards]);
+          closeModal();
+          
+          if (!isAccordionOpen) setIsAccordionOpen(true);
+        } else {
+          toast.error(response.message || "Erro ao salvar cartão.");
+        }
       }
     } catch (error) {
       toast.error("Ocorreu um erro inesperado.");
@@ -143,10 +204,14 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
                     
                     <div className="flex justify-between items-start mb-6">
                       <div className="font-medium tracking-widest text-white/80">CREDIT CARD</div>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 32 24" fill="none" className="opacity-80">
-                        <circle cx="12" cy="12" r="10" fill="currentColor" fillOpacity="0.5"/>
-                        <circle cx="20" cy="12" r="10" fill="currentColor" fillOpacity="0.5"/>
-                      </svg>
+                      <div className="flex items-center gap-2 relative z-10">
+                        <button onClick={() => openEditCardModal(card)} className="p-1.5 bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-sm transition-colors text-white" title="Editar">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <button onClick={() => handleDeleteCard(card.id)} className="p-1.5 bg-red-500/80 hover:bg-red-600 rounded-full backdrop-blur-sm transition-colors text-white" title="Excluir">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                      </div>
                     </div>
                     
                     <div className="text-lg font-bold truncate tracking-wider mb-1">
@@ -177,7 +242,7 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
             )}
 
             <button 
-              onClick={() => setIsModalOpen(true)}
+              onClick={openNewCardModal}
               className="w-full py-4 border-2 border-dashed border-indigo-300 dark:border-indigo-700/50 rounded-xl text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors flex items-center justify-center gap-2"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -196,16 +261,16 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div 
             className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
-            onClick={() => setIsModalOpen(false)}
+            onClick={closeModal}
           ></div>
           
           <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg z-10 overflow-hidden flex flex-col max-h-[90vh]">
             <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
               <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                Cadastrar Novo Cartão
+                {editingCardId ? 'Editar Cartão' : 'Cadastrar Novo Cartão'}
               </h3>
               <button 
-                onClick={() => setIsModalOpen(false)}
+                onClick={closeModal}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -247,7 +312,7 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
                 </div>
               </div>
 
-              <form id="cardForm" onSubmit={handleAddCard} className="space-y-4">
+              <form id="cardForm" onSubmit={handleSaveCard} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome do Cartão (Apelido)</label>
                   <input
@@ -337,7 +402,7 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
             <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3 bg-gray-50 dark:bg-gray-800/50">
               <button 
                 type="button"
-                onClick={() => setIsModalOpen(false)}
+                onClick={closeModal}
                 className="px-5 py-2.5 rounded-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
               >
                 Cancelar
