@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getUserGastos } from '@/actions/gasto';
 import { getUserCards } from '@/actions/card';
+import { getUserDespesasFixas } from '@/actions/despesaFixa';
 import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -20,6 +21,9 @@ export default async function DashboardPage() {
 
   const cardsData = await getUserCards();
   const cards = cardsData.success ? cardsData.data : [];
+
+  const despesasFixasData = await getUserDespesasFixas();
+  const despesasFixas = despesasFixasData.success ? despesasFixasData.data : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
@@ -58,7 +62,7 @@ export default async function DashboardPage() {
 
       {/* Main Content */}
       <main className="flex flex-col items-center justify-center p-6 mt-4 sm:mt-8 gap-8 max-w-6xl mx-auto w-full">
-        <DashboardClient gastos={gastos} cards={cards} />
+        <DashboardClient gastos={gastos} cards={cards} despesasFixas={despesasFixas} />
       </main>
     </div>
   );

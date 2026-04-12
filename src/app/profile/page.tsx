@@ -8,6 +8,8 @@ import Link from 'next/link';
 import LogoutButton from '@/components/LogoutButton';
 import ThemeToggle from '@/components/ThemeToggle';
 import CardManager from '@/components/CardManager';
+import { getUserDespesasFixas } from '@/actions/despesaFixa';
+import DespesaFixaManager from '@/components/DespesaFixaManager';
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
@@ -21,6 +23,9 @@ export default async function ProfilePage() {
 
   const cardsData = await getUserCards();
   const userCards = cardsData.success ? cardsData.data : [];
+
+  const despesasFixasData = await getUserDespesasFixas();
+  const despesasFixas = despesasFixasData.success ? despesasFixasData.data : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
@@ -82,6 +87,9 @@ export default async function ProfilePage() {
 
         {/* Card Management Section */}
         <CardManager initialCards={userCards} />
+
+        {/* Fixed Expenses Management Section */}
+        <DespesaFixaManager initialDespesas={despesasFixas} />
 
         {/* Monthly History Section */}
         <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 p-8 sm:p-10 transition-colors duration-300">
