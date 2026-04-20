@@ -26,7 +26,7 @@ export async function createGasto(prevState: any, formData: FormData) {
     const id = formData.get('id') as string;
     const name = formData.get('name') as string;
     const valueStr = formData.get('value') as string;
-    const value = parseFloat(valueStr);
+    let value = parseFloat(valueStr);
     const dateStr = formData.get('date') as string;
     const date = dateStr ? new Date(dateStr) : new Date();
     const installmentsStr = formData.get('installments') as string;
@@ -39,6 +39,10 @@ export async function createGasto(prevState: any, formData: FormData) {
     if (payment_method && payment_method.startsWith('CARD_')) {
       cardId = payment_method.replace('CARD_', '');
       payment_method = 'CARTAO';
+    }
+
+    if (!id && payment_method === 'CARTAO' && installments > 1) {
+      value = value / installments;
     }
 
     if (id) {
