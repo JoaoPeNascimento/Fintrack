@@ -1,12 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import GastoForm from './GastoForm';
 import ExpenseTable from './ExpenseTable';
 import FixedExpenseTable from './FixedExpenseTable';
 import { DespesaFixa } from './DespesaFixaManager';
-import DashboardCharts from './DashboardCharts';
 import GastoModal from './GastoModal';
+
+const DashboardCharts = dynamic(() => import('./DashboardCharts'), { 
+  ssr: false, 
+  loading: () => <div className="animate-pulse h-[300px] bg-gray-200 dark:bg-gray-700/50 rounded-2xl w-full m-6"></div> 
+});
 
 type Gasto = {
   _id: string;
@@ -28,28 +33,27 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
   const [editingGasto, setEditingGasto] = useState<Gasto | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleEdit = (gasto: Gasto) => {
+  const handleEdit = useCallback((gasto: Gasto) => {
     setEditingGasto(gasto);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setEditingGasto(null);
     setIsModalOpen(false);
-  };
+  }, []);
 
-  const handleOpenNew = () => {
+  const handleOpenNew = useCallback(() => {
     setEditingGasto(null);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const totalGastos = gastos.reduce((acc, gasto) => acc + gasto.value, 0);
-  const totalFixas = despesasFixas.reduce((acc, d) => acc + d.value, 0);
+  const totalGastos = useMemo(() => gastos.reduce((acc, gasto) => acc + gasto.value, 0), [gastos]);
+  const totalFixas = useMemo(() => despesasFixas.reduce((acc, d) => acc + d.value, 0), [despesasFixas]);
   const totalGlobal = totalGastos + totalFixas;
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-  };
+  const formatter = useMemo(() => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }), []);
+  const formatCurrency = useCallback((value: number) => formatter.format(value), [formatter]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-8 w-full pb-24 relative">

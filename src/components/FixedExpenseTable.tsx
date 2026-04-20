@@ -1,8 +1,13 @@
 'use client';
 
+import { memo, useMemo } from 'react';
 import { DespesaFixa } from '@/components/DespesaFixaManager';
 
-export default function FixedExpenseTable({ despesas }: { despesas: DespesaFixa[] }) {
+const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+const FixedExpenseTable = ({ despesas }: { despesas: DespesaFixa[] }) => {
+  const total = useMemo(() => despesas ? despesas.reduce((acc, d) => acc + d.value, 0) : 0, [despesas]);
+
   if (!despesas || despesas.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-6 text-gray-500 dark:text-gray-400">
@@ -36,7 +41,7 @@ export default function FixedExpenseTable({ despesas }: { despesas: DespesaFixa[
               </td>
               <td className="py-4 px-4 text-right whitespace-nowrap">
                 <span className="font-bold text-rose-600 dark:text-rose-400 text-sm">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(despesa.value)}
+                  {currencyFormatter.format(despesa.value)}
                 </span>
               </td>
             </tr>
@@ -49,7 +54,7 @@ export default function FixedExpenseTable({ despesas }: { despesas: DespesaFixa[
             </td>
             <td className="py-4 px-4 text-right whitespace-nowrap">
               <span className="font-bold text-rose-600 dark:text-rose-400 text-sm">
-                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(despesas.reduce((acc, d) => acc + d.value, 0))}
+                {currencyFormatter.format(total)}
               </span>
             </td>
           </tr>
@@ -58,3 +63,5 @@ export default function FixedExpenseTable({ despesas }: { despesas: DespesaFixa[
     </div>
   );
 }
+
+export default memo(FixedExpenseTable);

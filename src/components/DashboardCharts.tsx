@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import {
   PieChart,
   Pie,
@@ -31,7 +31,9 @@ type DespesaFixa = {
 
 const COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'];
 
-export default function DashboardCharts({ gastos, despesasFixas }: { gastos: Gasto[], despesasFixas: DespesaFixa[] }) {
+const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+const DashboardCharts = ({ gastos, despesasFixas }: { gastos: Gasto[], despesasFixas: DespesaFixa[] }) => {
   
   const pieData = useMemo(() => {
     const expensesByMethod = gastos.reduce((acc, gasto) => {
@@ -61,7 +63,7 @@ export default function DashboardCharts({ gastos, despesasFixas }: { gastos: Gas
   }, [gastos, despesasFixas]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    return currencyFormatter.format(value);
   };
 
   return (
@@ -134,4 +136,6 @@ export default function DashboardCharts({ gastos, despesasFixas }: { gastos: Gas
       </div>
     </div>
   );
-}
+};
+
+export default memo(DashboardCharts);

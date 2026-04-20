@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useTransition, memo, useMemo } from 'react';
 import { deleteGasto } from '@/actions/gasto';
 import toast from 'react-hot-toast';
 
@@ -14,8 +14,12 @@ type Gasto = {
   description?: string;
 };
 
-export default function ExpenseTable({ gastos, onEdit }: { gastos: Gasto[]; onEdit?: (gasto: Gasto) => void }) {
+const dateFormatter = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' });
+const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+const ExpenseTable = ({ gastos, onEdit }: { gastos: Gasto[]; onEdit?: (gasto: Gasto) => void }) => {
   const [isPending, startTransition] = useTransition();
+  const total = useMemo(() => gastos ? gastos.reduce((acc, gasto) => acc + gasto.value, 0) : 0, [gastos]);
 
   const handleDelete = (id: string) => {
     if (!window.confirm('Tem certeza que deseja excluir esta despesa?')) return;
@@ -58,7 +62,7 @@ export default function ExpenseTable({ gastos, onEdit }: { gastos: Gasto[]; onEd
           {gastos.map((gasto) => (
             <tr key={gasto._id} className="hover:bg-indigo-50/50 dark:hover:bg-gray-700/30 transition-colors group">
               <td className="py-4 px-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                {gasto.date ? new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(new Date(gasto.date)) : '--/--/----'}
+                {gasto.date ? dateFormatter.format(new Date(gasto.date)) : '--/--/----'}
               </td>
               <td className="py-4 px-4">
                 <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm">{gasto.name}</p>
@@ -70,7 +74,7 @@ export default function ExpenseTable({ gastos, onEdit }: { gastos: Gasto[]; onEd
               </td>
               <td className="py-4 px-4 text-right whitespace-nowrap">
                 <span className="font-bold text-red-600 dark:text-red-400 text-sm">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gasto.value)}
+                  {currencyFormatter.format(gasto.value)}
                 </span>
               </td>
               <td className="py-4 px-4 text-sm text-center">
@@ -119,7 +123,7 @@ export default function ExpenseTable({ gastos, onEdit }: { gastos: Gasto[]; onEd
             </td>
             <td className="py-4 px-4 text-right whitespace-nowrap">
               <span className="font-bold text-red-600 dark:text-red-400 text-sm">
-                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gastos.reduce((acc, gasto) => acc + gasto.value, 0))}
+                {currencyFormatter.format(total)}
               </span>
             </td>
             <td colSpan={3}></td>
@@ -128,4 +132,6 @@ export default function ExpenseTable({ gastos, onEdit }: { gastos: Gasto[]; onEd
       </table>
     </div>
   );
-}
+};
+
+export default memo(ExpenseTable);
