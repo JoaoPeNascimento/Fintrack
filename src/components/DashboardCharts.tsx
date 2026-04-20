@@ -89,7 +89,7 @@ export default function DashboardCharts({ gastos, despesasFixas }: { gastos: Gas
                   ))}
                 </Pie>
                 <Tooltip 
-                  formatter={(value: number) => formatCurrency(value)}
+                  formatter={(value: any) => formatCurrency(Number(value))}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                 />
                 <Legend />
@@ -120,7 +120,7 @@ export default function DashboardCharts({ gastos, despesasFixas }: { gastos: Gas
               />
               <Tooltip 
                 cursor={{fill: 'transparent'}}
-                formatter={(value: number) => formatCurrency(value)}
+                formatter={(value: any) => formatCurrency(Number(value))}
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
               />
               <Bar dataKey="valor" radius={[4, 4, 0, 0]}>
