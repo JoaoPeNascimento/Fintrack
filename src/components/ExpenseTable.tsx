@@ -17,7 +17,7 @@ type Gasto = {
 const dateFormatter = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' });
 const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-const ExpenseTable = ({ gastos, onEdit }: { gastos: Gasto[]; onEdit?: (gasto: Gasto) => void }) => {
+const ExpenseTable = ({ gastos, onEdit, onViewClick }: { gastos: Gasto[]; onEdit?: (gasto: Gasto) => void; onViewClick?: (gasto: Gasto) => void }) => {
   const [isPending, startTransition] = useTransition();
   const total = useMemo(() => gastos ? gastos.reduce((acc, gasto) => acc + gasto.value, 0) : 0, [gastos]);
 
@@ -60,7 +60,7 @@ const ExpenseTable = ({ gastos, onEdit }: { gastos: Gasto[]; onEdit?: (gasto: Ga
         </thead>
         <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
           {gastos.map((gasto) => (
-            <tr key={gasto._id} className="hover:bg-indigo-50/50 dark:hover:bg-gray-700/30 transition-colors group">
+            <tr key={gasto._id} onClick={() => onViewClick && onViewClick(gasto)} className="hover:bg-indigo-50/50 dark:hover:bg-gray-700/30 transition-colors group cursor-pointer">
               <td className="py-4 px-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
                 {gasto.date ? dateFormatter.format(new Date(gasto.date)) : '--/--/----'}
               </td>
@@ -90,7 +90,7 @@ const ExpenseTable = ({ gastos, onEdit }: { gastos: Gasto[]; onEdit?: (gasto: Ga
               <td className="py-4 px-4 text-center">
                 <div className="flex justify-center gap-2">
                   <button
-                    onClick={() => onEdit && onEdit(gasto)}
+                    onClick={(e) => { e.stopPropagation(); onEdit && onEdit(gasto); }}
                     className="p-2 text-indigo-400 dark:text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
                     title="Editar despesa"
                   >
@@ -100,7 +100,7 @@ const ExpenseTable = ({ gastos, onEdit }: { gastos: Gasto[]; onEdit?: (gasto: Ga
                     </svg>
                   </button>
                   <button
-                    onClick={() => handleDelete(gasto._id)}
+                    onClick={(e) => { e.stopPropagation(); handleDelete(gasto._id); }}
                     disabled={isPending}
                     className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
                     title="Excluir despesa"

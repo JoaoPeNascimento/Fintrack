@@ -5,7 +5,7 @@ import { DespesaFixa } from '@/components/DespesaFixaManager';
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-const FixedExpenseTable = ({ despesas }: { despesas: DespesaFixa[] }) => {
+const FixedExpenseTable = ({ despesas, onViewClick }: { despesas: DespesaFixa[]; onViewClick?: (despesa: DespesaFixa) => void }) => {
   const total = useMemo(() => despesas ? despesas.reduce((acc, d) => acc + d.value, 0) : 0, [despesas]);
 
   if (!despesas || despesas.length === 0) {
@@ -30,7 +30,7 @@ const FixedExpenseTable = ({ despesas }: { despesas: DespesaFixa[] }) => {
         </thead>
         <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
           {despesas.map((despesa) => (
-            <tr key={despesa._id} className="hover:bg-rose-50/50 dark:hover:bg-gray-700/30 transition-colors group">
+            <tr key={despesa._id} onClick={() => onViewClick && onViewClick(despesa)} className="hover:bg-rose-50/50 dark:hover:bg-gray-700/30 transition-colors group cursor-pointer">
               <td className="py-4 px-4">
                 <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm">{despesa.name}</p>
                 {despesa.description && (

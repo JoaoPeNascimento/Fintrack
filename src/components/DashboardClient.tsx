@@ -7,6 +7,7 @@ import ExpenseTable from './ExpenseTable';
 import FixedExpenseTable from './FixedExpenseTable';
 import { DespesaFixa } from './DespesaFixaManager';
 import GastoModal from './GastoModal';
+import ViewExpenseDetails from './ViewExpenseDetails';
 
 const DashboardCharts = dynamic(() => import('./DashboardCharts'), { 
   ssr: false, 
@@ -31,7 +32,9 @@ type Card = {
 
 export default function DashboardClient({ gastos, cards, despesasFixas = [] }: { gastos: Gasto[], cards: Card[], despesasFixas?: DespesaFixa[] }) {
   const [editingGasto, setEditingGasto] = useState<Gasto | null>(null);
+  const [viewingGasto, setViewingGasto] = useState<Gasto | DespesaFixa | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   const handleEdit = useCallback((gasto: Gasto) => {
     setEditingGasto(gasto);
@@ -41,6 +44,16 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
   const handleCloseModal = useCallback(() => {
     setEditingGasto(null);
     setIsModalOpen(false);
+  }, []);
+
+  const handleViewClick = useCallback((gasto: Gasto | DespesaFixa) => {
+    setViewingGasto(gasto);
+    setIsViewModalOpen(true);
+  }, []);
+
+  const handleCloseViewModal = useCallback(() => {
+    setViewingGasto(null);
+    setIsViewModalOpen(false);
   }, []);
 
   const handleOpenNew = useCallback(() => {
@@ -66,6 +79,14 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
           {editingGasto ? 'Altere as informações da sua despesa.' : 'Preencha os dados abaixo para registrar no seu gerenciador financeiro.'}
         </p>
         <GastoForm gastoToEdit={editingGasto} onSuccess={handleCloseModal} cards={cards} />
+      </GastoModal>
+
+      <GastoModal 
+        isOpen={isViewModalOpen} 
+        onClose={handleCloseViewModal}
+        title="Detalhes"
+      >
+        <ViewExpenseDetails gasto={viewingGasto} onClose={handleCloseViewModal} />
       </GastoModal>
 
       {/* Hero Stats */}
@@ -97,7 +118,7 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">
             Histórico detalhado das suas despesas variáveis.
           </p>
-          <ExpenseTable gastos={gastos} onEdit={handleEdit} />
+          <ExpenseTable gastos={gastos} onEdit={handleEdit} onViewClick={handleViewClick} />
         </div>
 
         {/* Fixed Expenses List */}
@@ -108,7 +129,7 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">
             Gerencie suas contas que vencem todo mês.
           </p>
-          <FixedExpenseTable despesas={despesasFixas} />
+          <FixedExpenseTable despesas={despesasFixas} onViewClick={handleViewClick} />
         </div>
       </div>
 
