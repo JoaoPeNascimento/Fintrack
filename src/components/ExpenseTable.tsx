@@ -50,8 +50,8 @@ const ExpenseTable = ({ gastos, onEdit, onViewClick }: { gastos: Gasto[]; onEdit
       <table className="w-full text-left border-collapse min-w-[600px]">
         <thead>
           <tr className="border-b border-indigo-100 dark:border-gray-700 pb-2">
+            <th className="sticky left-0 z-10 bg-white dark:bg-gray-800 border-r border-indigo-100 dark:border-gray-700 py-4 px-4 font-semibold text-indigo-800 dark:text-indigo-300 text-sm min-w-[180px]">Nome / Descrição</th>
             <th className="py-4 px-4 font-semibold text-indigo-800 dark:text-indigo-300 text-sm w-32">Data</th>
-            <th className="py-4 px-4 font-semibold text-indigo-800 dark:text-indigo-300 text-sm">Nome / Descrição</th>
             <th className="py-4 px-4 font-semibold text-indigo-800 dark:text-indigo-300 text-sm w-32 text-right">Valor</th>
             <th className="py-4 px-4 font-semibold text-indigo-800 dark:text-indigo-300 text-sm w-40 text-center">Forma de Pagamento</th>
             <th className="py-4 px-4 font-semibold text-indigo-800 dark:text-indigo-300 text-sm w-24 text-center">Parcelas</th>
@@ -61,16 +61,16 @@ const ExpenseTable = ({ gastos, onEdit, onViewClick }: { gastos: Gasto[]; onEdit
         <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
           {gastos.map((gasto) => (
             <tr key={gasto._id} onClick={() => onViewClick && onViewClick(gasto)} className="hover:bg-indigo-50/50 dark:hover:bg-gray-700/30 transition-colors group cursor-pointer">
-              <td className="py-4 px-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                {gasto.date ? dateFormatter.format(new Date(gasto.date)) : '--/--/----'}
-              </td>
-              <td className="py-4 px-4">
+              <td className="sticky left-0 z-10 bg-white dark:bg-gray-800 group-hover:bg-indigo-50/50 dark:group-hover:bg-gray-700/30 border-r border-indigo-50 dark:border-gray-700/50 py-4 px-4 transition-colors">
                 <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm">{gasto.name}</p>
                 {gasto.description && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate max-w-[200px] sm:max-w-xs" title={gasto.description}>
                     {gasto.description}
                   </p>
                 )}
+              </td>
+              <td className="py-4 px-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                {gasto.date ? dateFormatter.format(new Date(gasto.date)) : '--/--/----'}
               </td>
               <td className="py-4 px-4 text-right whitespace-nowrap">
                 <span className="font-bold text-red-600 dark:text-red-400 text-sm">
@@ -118,9 +118,10 @@ const ExpenseTable = ({ gastos, onEdit, onViewClick }: { gastos: Gasto[]; onEdit
         </tbody>
         <tfoot className="border-t-2 border-indigo-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30">
           <tr>
-            <td colSpan={2} className="py-4 px-4 text-indigo-900 dark:text-indigo-200 font-bold text-sm">
+            <td className="sticky left-0 z-10 bg-gray-50 dark:bg-gray-800 border-r border-indigo-100 dark:border-gray-700 py-4 px-4 text-indigo-900 dark:text-indigo-200 font-bold text-sm">
               Total ({gastos.length} {gastos.length === 1 ? 'gasto registrado' : 'gastos registrados'})
             </td>
+            <td className="py-4 px-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap"></td>
             <td className="py-4 px-4 text-right whitespace-nowrap">
               <span className="font-bold text-red-600 dark:text-red-400 text-sm">
                 {currencyFormatter.format(total)}
