@@ -53,7 +53,6 @@ export async function createCard(formData: {
     
     return { success: true, message: 'Cartão registrado com sucesso!', card: cardData };
   } catch (error: any) {
-    console.error('Error creating Card:', error);
     return { success: false, message: error.message || 'Falha ao salvar o cartão no banco de dados.' };
   }
 }
@@ -86,7 +85,6 @@ export async function getUserCards() {
 
     return { success: true, data: plainCards };
   } catch (error: any) {
-    console.error('Error fetching cards:', error);
     return { success: false, data: [] };
   }
 }
@@ -139,7 +137,6 @@ export async function updateCard(
 
     return { success: true, message: 'Cartão atualizado com sucesso!', card: cardData };
   } catch (error: any) {
-    console.error('Error updating Card:', error);
     return { success: false, message: error.message || 'Falha ao atualizar cartão.' };
   }
 }
@@ -163,7 +160,6 @@ export async function deleteCard(cardId: string) {
     revalidatePath('/profile');
     return { success: true, message: 'Cartão deletado com sucesso!' };
   } catch (error: any) {
-    console.error('Error deleting Card:', error);
     return { success: false, message: error.message || 'Falha ao deletar cartão.' };
   }
 }

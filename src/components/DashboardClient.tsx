@@ -35,6 +35,8 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
   const [viewingGasto, setViewingGasto] = useState<Gasto | DespesaFixa | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isGastosOpen, setIsGastosOpen] = useState(true);
+  const [isDespesasOpen, setIsDespesasOpen] = useState(true);
 
   const handleEdit = useCallback((gasto: Gasto) => {
     setEditingGasto(gasto);
@@ -108,28 +110,76 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
       {/* Charts */}
       <DashboardCharts gastos={gastos} despesasFixas={despesasFixas} />
 
-      {/* Tables Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 w-full items-start">
-        {/* Expenses List */}
-        <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 p-6 sm:p-8 overflow-hidden transition-colors duration-300">
-          <h2 className="text-xl sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-2">
-            Meus Gastos Variáveis
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">
-            Histórico detalhado das suas despesas variáveis.
-          </p>
-          <ExpenseTable gastos={gastos} onEdit={handleEdit} onViewClick={handleViewClick} />
+      {/* Tables (Accordions) */}
+      <div className="flex flex-col gap-6 w-full">
+        {/* Gastos Variáveis Accordion */}
+        <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 overflow-hidden transition-colors duration-300">
+          <button
+            onClick={() => setIsGastosOpen(!isGastosOpen)}
+            className="w-full flex items-center justify-between p-6 sm:p-8 text-left focus:outline-none hover:bg-gray-50/50 dark:hover:bg-gray-700/20 transition-colors duration-300 cursor-pointer"
+          >
+            <div>
+              <h2 className="text-xl sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+                Meus Gastos Variáveis
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1">
+                Histórico detalhado das suas despesas variáveis.
+              </p>
+            </div>
+            <div className="flex items-center justify-center p-2.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 transition-colors">
+              <svg
+                className={`w-6 h-6 transition-transform duration-300 ${isGastosOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </button>
+          
+          <div className={`grid transition-all duration-300 ease-in-out ${isGastosOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+            <div className="overflow-hidden">
+              <div className="px-6 pb-6 sm:px-8 sm:pb-8 border-t border-gray-100 dark:border-gray-700/50 pt-6">
+                <ExpenseTable gastos={gastos} onEdit={handleEdit} onViewClick={handleViewClick} />
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Fixed Expenses List */}
-        <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 p-6 sm:p-8 overflow-hidden transition-colors duration-300">
-          <h2 className="text-xl sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-orange-600 dark:from-rose-400 dark:to-orange-400 mb-2">
-            Despesas Fixas
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">
-            Gerencie suas contas que vencem todo mês.
-          </p>
-          <FixedExpenseTable despesas={despesasFixas} onViewClick={handleViewClick} />
+        {/* Fixed Expenses Accordion */}
+        <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 overflow-hidden transition-colors duration-300">
+          <button
+            onClick={() => setIsDespesasOpen(!isDespesasOpen)}
+            className="w-full flex items-center justify-between p-6 sm:p-8 text-left focus:outline-none hover:bg-gray-50/50 dark:hover:bg-gray-700/20 transition-colors duration-300 cursor-pointer"
+          >
+            <div>
+              <h2 className="text-xl sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-orange-600 dark:from-rose-400 dark:to-orange-400">
+                Despesas Fixas
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1">
+                Gerencie suas contas que vencem todo mês.
+              </p>
+            </div>
+            <div className="flex items-center justify-center p-2.5 rounded-full bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 transition-colors">
+              <svg
+                className={`w-6 h-6 transition-transform duration-300 ${isDespesasOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </button>
+          
+          <div className={`grid transition-all duration-300 ease-in-out ${isDespesasOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+            <div className="overflow-hidden">
+              <div className="px-6 pb-6 sm:px-8 sm:pb-8 border-t border-gray-100 dark:border-gray-700/50 pt-6">
+                <FixedExpenseTable despesas={despesasFixas} onViewClick={handleViewClick} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -79,7 +79,6 @@ export async function createGasto(prevState: any, formData: FormData) {
       return { success: true, message: 'Gasto registrado com sucesso!' };
     }
   } catch (error: any) {
-    console.error('Error creating Gasto:', error);
     return { success: false, message: error.message || 'Failed to create expense.' };
   }
 }
@@ -142,7 +141,6 @@ export async function getUserGastos() {
 
     return { success: true, data: plainGastos };
   } catch (error: any) {
-    console.error('Error fetching Gastos:', error);
     return { success: false, data: [] };
   }
 }
@@ -207,7 +205,6 @@ export async function getMonthlyExpenseSummary() {
 
     return { success: true, data: formattedData };
   } catch (error: any) {
-    console.error('Error fetching monthly summary:', error);
     return { success: false, data: [] };
   }
 }
@@ -249,7 +246,6 @@ export async function getExpensesByMonthAndYear(month: number, year: number) {
 
     return { success: true, data: plainGastos };
   } catch (error: any) {
-    console.error('Error fetching expenses for month:', error);
     return { success: false, data: [] };
   }
 }
@@ -280,7 +276,6 @@ export async function deleteGasto(id: string) {
 
     return { success: true, message: 'Gasto excluído com sucesso!' };
   } catch (error: any) {
-    console.error('Error deleting Gasto:', error);
     return { success: false, message: error.message || 'Erro ao excluir gasto.' };
   }
 }

@@ -52,7 +52,6 @@ export async function createDespesaFixa(prevState: any, formData: FormData) {
       return { success: true, message: 'Despesa fixa registrada com sucesso!' };
     }
   } catch (error: any) {
-    console.error('Error creating DespesaFixa:', error);
     return { success: false, message: error.message || 'Falha ao criar despesa fixa.' };
   }
 }
@@ -84,7 +83,6 @@ export async function getUserDespesasFixas() {
 
     return { success: true, data: plainItems };
   } catch (error: any) {
-    console.error('Error fetching Despesas Fixas:', error);
     return { success: false, data: [] };
   }
 }
@@ -115,7 +113,6 @@ export async function deleteDespesaFixa(id: string) {
 
     return { success: true, message: 'Despesa excluída com sucesso!' };
   } catch (error: any) {
-    console.error('Error deleting Despesa Fixa:', error);
     return { success: false, message: error.message || 'Erro ao excluir despesa.' };
   }
 }
