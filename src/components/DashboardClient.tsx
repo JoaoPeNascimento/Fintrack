@@ -11,7 +11,7 @@ import ViewExpenseDetails from './ViewExpenseDetails';
 
 const DashboardCharts = dynamic(() => import('./DashboardCharts'), { 
   ssr: false, 
-  loading: () => <div className="animate-pulse h-[300px] bg-gray-200 dark:bg-gray-700/50 rounded-2xl w-full m-6"></div> 
+  loading: () => <div className="animate-pulse h-[300px] bg-[#F0EDFF]/50 clay-card-static w-full m-6"></div> 
 });
 
 type Gasto = {
@@ -77,7 +77,7 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
         onClose={handleCloseModal}
         title={editingGasto ? 'Editar Gasto' : 'Adicionar Nova Despesa'}
       >
-        <p className="text-gray-500 dark:text-gray-400 mb-6 font-medium">
+        <p className="text-clay-secondary mb-6 font-medium">
           {editingGasto ? 'Altere as informações da sua despesa.' : 'Preencha os dados abaixo para registrar no seu gerenciador financeiro.'}
         </p>
         <GastoForm gastoToEdit={editingGasto} onSuccess={handleCloseModal} cards={cards} />
@@ -93,17 +93,17 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
 
       {/* Hero Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-         <div className="bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-indigo-600 dark:to-purple-700 rounded-2xl p-6 shadow-lg text-white transform hover:scale-[1.02] transition-transform duration-300">
-            <h3 className="text-xs sm:text-sm font-medium opacity-80 mb-1 uppercase tracking-wider">Total Variável (Mês)</h3>
-            <p className="text-2xl sm:text-3xl font-extrabold">{formatCurrency(totalGastos)}</p>
+         <div className="clay-stat clay-bg-purple p-6 text-clay-primary">
+            <h3 className="text-xs sm:text-sm font-medium text-clay-purple mb-1 uppercase tracking-wider">Total Variável (Mês)</h3>
+            <p className="text-2xl sm:text-3xl font-extrabold text-clay-purple">{formatCurrency(totalGastos)}</p>
          </div>
-         <div className="bg-gradient-to-br from-rose-500 to-orange-600 dark:from-rose-600 dark:to-orange-700 rounded-2xl p-6 shadow-lg text-white transform hover:scale-[1.02] transition-transform duration-300">
-            <h3 className="text-xs sm:text-sm font-medium opacity-80 mb-1 uppercase tracking-wider">Total Fixo (Mês)</h3>
-            <p className="text-2xl sm:text-3xl font-extrabold">{formatCurrency(totalFixas)}</p>
+         <div className="clay-stat clay-bg-pink p-6 text-clay-primary">
+            <h3 className="text-xs sm:text-sm font-medium text-clay-pink mb-1 uppercase tracking-wider">Total Fixo (Mês)</h3>
+            <p className="text-2xl sm:text-3xl font-extrabold text-clay-pink">{formatCurrency(totalFixas)}</p>
          </div>
-         <div className="bg-gradient-to-br from-emerald-500 to-teal-600 dark:from-emerald-600 dark:to-teal-700 rounded-2xl p-6 shadow-lg text-white transform hover:scale-[1.02] transition-transform duration-300">
-            <h3 className="text-xs sm:text-sm font-medium opacity-80 mb-1 uppercase tracking-wider">Despesa Global (Mês)</h3>
-            <p className="text-2xl sm:text-3xl font-extrabold">{formatCurrency(totalGlobal)}</p>
+         <div className="clay-stat clay-bg-teal p-6 text-clay-primary">
+            <h3 className="text-xs sm:text-sm font-medium text-clay-teal mb-1 uppercase tracking-wider">Despesa Global (Mês)</h3>
+            <p className="text-2xl sm:text-3xl font-extrabold text-clay-teal">{formatCurrency(totalGlobal)}</p>
          </div>
       </div>
 
@@ -113,20 +113,20 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
       {/* Tables (Accordions) */}
       <div className="flex flex-col gap-6 w-full">
         {/* Gastos Variáveis Accordion */}
-        <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 overflow-hidden transition-colors duration-300">
+        <div className="w-full clay-card-static clay-bg-container overflow-hidden transition-colors duration-300">
           <button
             onClick={() => setIsGastosOpen(!isGastosOpen)}
-            className="w-full flex items-center justify-between p-6 sm:p-8 text-left focus:outline-none hover:bg-gray-50/50 dark:hover:bg-gray-700/20 transition-colors duration-300 cursor-pointer"
+            className="clay-accordion-btn w-full flex items-center justify-between p-6 sm:p-8 text-left focus:outline-none cursor-pointer"
           >
             <div>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+              <h2 className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-[#7C5CFC] to-[#9B7FFF] bg-clip-text text-transparent">
                 Meus Gastos Variáveis
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1">
+              <p className="text-sm text-clay-secondary font-medium mt-1">
                 Histórico detalhado das suas despesas variáveis.
               </p>
             </div>
-            <div className="flex items-center justify-center p-2.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 transition-colors">
+            <div className="flex items-center justify-center p-2.5 rounded-full bg-[#F0EDFF] dark:bg-[#242145] clay-icon text-[#7C5CFC] dark:text-[#a58eff]">
               <svg
                 className={`w-6 h-6 transition-transform duration-300 ${isGastosOpen ? 'rotate-180' : ''}`}
                 fill="none"
@@ -140,7 +140,7 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
           
           <div className={`grid transition-all duration-300 ease-in-out ${isGastosOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
             <div className="overflow-hidden">
-              <div className="px-6 pb-6 sm:px-8 sm:pb-8 border-t border-gray-100 dark:border-gray-700/50 pt-6">
+              <div className="px-6 pb-6 sm:px-8 sm:pb-8 border-t border-[#7C5CFC]/10 pt-6">
                 <ExpenseTable gastos={gastos} onEdit={handleEdit} onViewClick={handleViewClick} />
               </div>
             </div>
@@ -148,20 +148,20 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
         </div>
 
         {/* Fixed Expenses Accordion */}
-        <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 overflow-hidden transition-colors duration-300">
+        <div className="w-full clay-card-static clay-bg-pink overflow-hidden transition-colors duration-300">
           <button
             onClick={() => setIsDespesasOpen(!isDespesasOpen)}
-            className="w-full flex items-center justify-between p-6 sm:p-8 text-left focus:outline-none hover:bg-gray-50/50 dark:hover:bg-gray-700/20 transition-colors duration-300 cursor-pointer"
+            className="clay-accordion-btn w-full flex items-center justify-between p-6 sm:p-8 text-left focus:outline-none cursor-pointer"
           >
             <div>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-orange-600 dark:from-rose-400 dark:to-orange-400">
+              <h2 className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-[#FF7EB3] to-[#FFB347] bg-clip-text text-transparent">
                 Despesas Fixas
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1">
+              <p className="text-sm text-clay-secondary font-medium mt-1">
                 Gerencie suas contas que vencem todo mês.
               </p>
             </div>
-            <div className="flex items-center justify-center p-2.5 rounded-full bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 transition-colors">
+            <div className="flex items-center justify-center p-2.5 rounded-full bg-[#FFF0F5] dark:bg-[#3A2338] clay-icon text-[#FF7EB3] dark:text-[#ff9ecf]">
               <svg
                 className={`w-6 h-6 transition-transform duration-300 ${isDespesasOpen ? 'rotate-180' : ''}`}
                 fill="none"
@@ -175,7 +175,7 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
           
           <div className={`grid transition-all duration-300 ease-in-out ${isDespesasOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
             <div className="overflow-hidden">
-              <div className="px-6 pb-6 sm:px-8 sm:pb-8 border-t border-gray-100 dark:border-gray-700/50 pt-6">
+              <div className="px-6 pb-6 sm:px-8 sm:pb-8 border-t border-[#FF7EB3]/10 pt-6">
                 <FixedExpenseTable despesas={despesasFixas} onViewClick={handleViewClick} />
               </div>
             </div>
@@ -186,7 +186,7 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
       {/* FAB - Floating Action Button */}
       <button
         onClick={handleOpenNew}
-        className="fixed bottom-6 right-6 sm:bottom-10 sm:right-10 z-40 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-full w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center shadow-[0_10px_25px_rgba(99,102,241,0.5)] hover:shadow-[0_15px_35px_rgba(99,102,241,0.6)] hover:-translate-y-1 active:translate-y-0 active:scale-95 transition-all duration-300 group"
+        className="clay-button fixed bottom-6 right-6 sm:bottom-10 sm:right-10 z-40 bg-gradient-to-r from-[#7C5CFC] to-[#9B7FFF] text-white rounded-2xl w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center animate-pulse-clay group cursor-pointer"
         aria-label="Adicionar Nova Despesa"
         title="Adicionar Nova Despesa"
       >

@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gerenciador Financeiro",
-  description: "Controle seus gastos",
+  title: "Fintrack — Gerencie seus gastos com facilidade",
+  description: "O gerenciador financeiro mais simples e completo. Controle despesas fixas e variáveis, acompanhe gráficos e tenha visão total das suas finanças. Grátis.",
 };
 
 export default function RootLayout({

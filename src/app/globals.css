@@ -25,3 +25,552 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* ===== CLAYMORPHISM DESIGN SYSTEM ===== */
+
+/* ===== CLAYMORPHISM DESIGN SYSTEM ===== */
+
+/* Clay Card Base */
+.clay-card {
+  border-radius: 28px;
+  box-shadow:
+    10px 10px 22px rgba(124, 92, 252, 0.12),
+    -6px -6px 16px rgba(255, 255, 255, 0.95),
+    inset 4px 4px 8px rgba(255, 255, 255, 0.8),
+    inset -4px -4px 8px rgba(124, 92, 252, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.clay-card:hover {
+  transform: scale(0.97) translateY(2px);
+  box-shadow:
+    6px 6px 12px rgba(124, 92, 252, 0.08),
+    -3px -3px 8px rgba(255, 255, 255, 0.85),
+    inset 6px 6px 10px rgba(124, 92, 252, 0.12),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+}
+
+/* Clay Card Variants (with matching inset/outer shadows for colored elements) */
+.clay-card-pink {
+  box-shadow:
+    10px 10px 22px rgba(255, 126, 179, 0.15),
+    -6px -6px 16px rgba(255, 255, 255, 0.95),
+    inset 4px 4px 8px rgba(255, 255, 255, 0.8),
+    inset -4px -4px 8px rgba(255, 126, 179, 0.18);
+}
+.clay-card-pink:hover {
+  box-shadow:
+    6px 6px 12px rgba(255, 126, 179, 0.1),
+    -3px -3px 8px rgba(255, 255, 255, 0.85),
+    inset 6px 6px 10px rgba(255, 126, 179, 0.15),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+}
+
+.clay-card-teal {
+  box-shadow:
+    10px 10px 22px rgba(92, 224, 216, 0.15),
+    -6px -6px 16px rgba(255, 255, 255, 0.95),
+    inset 4px 4px 8px rgba(255, 255, 255, 0.8),
+    inset -4px -4px 8px rgba(92, 224, 216, 0.18);
+}
+.clay-card-teal:hover {
+  box-shadow:
+    6px 6px 12px rgba(92, 224, 216, 0.1),
+    -3px -3px 8px rgba(255, 255, 255, 0.85),
+    inset 6px 6px 10px rgba(92, 224, 216, 0.15),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+}
+
+.clay-card-orange {
+  box-shadow:
+    10px 10px 22px rgba(255, 179, 71, 0.15),
+    -6px -6px 16px rgba(255, 255, 255, 0.95),
+    inset 4px 4px 8px rgba(255, 255, 255, 0.8),
+    inset -4px -4px 8px rgba(255, 179, 71, 0.18);
+}
+.clay-card-orange:hover {
+  box-shadow:
+    6px 6px 12px rgba(255, 179, 71, 0.1),
+    -3px -3px 8px rgba(255, 255, 255, 0.85),
+    inset 6px 6px 10px rgba(255, 179, 71, 0.15),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.9);
+}
+
+/* Clay Button */
+.clay-button {
+  border-radius: 18px;
+  box-shadow:
+    6px 6px 16px rgba(124, 92, 252, 0.28),
+    -4px -4px 10px rgba(255, 255, 255, 0.85),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.4),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.clay-button:hover {
+  transform: scale(1.03) translateY(-2px);
+  box-shadow:
+    8px 8px 22px rgba(124, 92, 252, 0.35),
+    -5px -5px 12px rgba(255, 255, 255, 0.9),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.4);
+}
+
+.clay-button:active {
+  transform: scale(0.96);
+  box-shadow:
+    3px 3px 8px rgba(124, 92, 252, 0.2),
+    -1px -1px 4px rgba(255, 255, 255, 0.5),
+    inset 4px 4px 8px rgba(124, 92, 252, 0.18);
+}
+
+/* Clay Icon Container */
+.clay-icon {
+  border-radius: 20px;
+  box-shadow:
+    6px 6px 14px rgba(124, 92, 252, 0.12),
+    -3px -3px 8px rgba(255, 255, 255, 0.9),
+    inset 3px 3px 6px rgba(255, 255, 255, 0.8),
+    inset -2px -2px 4px rgba(124, 92, 252, 0.08);
+}
+
+/* Clay Step Number */
+.clay-step {
+  border-radius: 50%;
+  box-shadow:
+    5px 5px 12px rgba(124, 92, 252, 0.18),
+    -3px -3px 8px rgba(255, 255, 255, 0.95),
+    inset 3px 3px 6px rgba(255, 255, 255, 0.7),
+    inset -2px -2px 4px rgba(124, 92, 252, 0.1);
+}
+
+/* ===== ANIMATIONS ===== */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-12px) rotate(2deg); }
+  50% { transform: translateY(-6px) rotate(-1deg); }
+  75% { transform: translateY(-16px) rotate(1deg); }
+}
+
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(-2deg); }
+  66% { transform: translateY(-18px) rotate(1.5deg); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-clay {
+  0%, 100% {
+    box-shadow:
+      6px 6px 14px rgba(124, 92, 252, 0.25),
+      -3px -3px 8px rgba(255, 255, 255, 0.6),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.4);
+  }
+  50% {
+    box-shadow:
+      10px 10px 24px rgba(124, 92, 252, 0.35),
+      -5px -5px 12px rgba(255, 255, 255, 0.7),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.5);
+  }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Animation utility classes */
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-delayed { animation: float-delayed 7s ease-in-out infinite; }
+.animate-float-slow { animation: float-slow 5s ease-in-out infinite; }
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+.animate-bounce-in { animation: bounce-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-pulse-clay { animation: pulse-clay 3s ease-in-out infinite; }
+.animate-spin-slow { animation: spin-slow 20s linear infinite; }
+
+/* Scroll reveal */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger delays */
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+.delay-400 { transition-delay: 400ms; }
+.delay-500 { transition-delay: 500ms; }
+
+/* Landing page specific */
+.landing-gradient {
+  background: linear-gradient(135deg, #F0EDFF 0%, #E8E0FF 30%, #FFF7ED 70%, #FFF0F5 100%);
+}
+
+.text-clay-primary { color: #2D2B55; }
+.text-clay-secondary { color: #6B6B8D; }
+.bg-clay-lavender { background: #F0EDFF; }
+.bg-clay-peach { background: #FFF7ED; }
+
+/* ===== APP-WIDE CLAY CLASSES ===== */
+
+/* Clay Card Static (no hover press — for section containers) */
+.clay-card-static {
+  border-radius: 24px;
+  box-shadow:
+    8px 8px 20px rgba(124, 92, 252, 0.12),
+    -4px -4px 12px rgba(255, 255, 255, 0.8),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.6),
+    inset -1px -1px 3px rgba(124, 92, 252, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Clay Input */
+.clay-input {
+  border-radius: 14px;
+  border: 1px solid rgba(124, 92, 252, 0.15);
+  box-shadow:
+    inset 2px 2px 5px rgba(124, 92, 252, 0.06),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.7);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  outline: none;
+}
+
+.clay-input:focus {
+  border-color: rgba(124, 92, 252, 0.4);
+  box-shadow:
+    inset 2px 2px 5px rgba(124, 92, 252, 0.1),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.6),
+    0 0 0 3px rgba(124, 92, 252, 0.1);
+}
+
+/* Clay Modal */
+.clay-modal {
+  border-radius: 28px;
+  box-shadow:
+    12px 12px 30px rgba(124, 92, 252, 0.2),
+    -6px -6px 16px rgba(255, 255, 255, 0.7),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Clay Header / Navbar */
+.clay-header {
+  box-shadow:
+    0 4px 16px rgba(124, 92, 252, 0.08),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  border-bottom: 1px solid rgba(124, 92, 252, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+/* Clay Stat Cards */
+.clay-stat {
+  border-radius: 20px;
+  box-shadow:
+    6px 6px 16px rgba(124, 92, 252, 0.15),
+    -3px -3px 10px rgba(255, 255, 255, 0.7),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.4),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.clay-stat:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    8px 8px 22px rgba(124, 92, 252, 0.2),
+    -4px -4px 14px rgba(255, 255, 255, 0.8),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.5),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.03);
+}
+
+/* Clay Badge */
+.clay-badge {
+  border-radius: 12px;
+  box-shadow:
+    3px 3px 8px rgba(124, 92, 252, 0.1),
+    -2px -2px 5px rgba(255, 255, 255, 0.7),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Clay Table Row */
+.clay-table-row {
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clay-table-row:hover {
+  background: rgba(124, 92, 252, 0.04);
+}
+
+/* Clay Accordion Button */
+.clay-accordion-btn {
+  transition: background-color 0.2s ease;
+}
+
+.clay-accordion-btn:hover {
+  background: rgba(124, 92, 252, 0.04);
+}
+
+/* Clay Dashed Add Button */
+.clay-dashed {
+  border-radius: 16px;
+  border: 2px dashed rgba(124, 92, 252, 0.25);
+  box-shadow:
+    inset 2px 2px 5px rgba(124, 92, 252, 0.04),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.3);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clay-dashed:hover {
+  border-color: rgba(124, 92, 252, 0.4);
+  background: rgba(124, 92, 252, 0.04);
+  box-shadow:
+    inset 2px 2px 5px rgba(124, 92, 252, 0.06),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.4),
+    4px 4px 12px rgba(124, 92, 252, 0.06);
+}
+
+/* ===== DARK MODE CLAY VARIANTS ===== */
+
+.dark .clay-card,
+.dark .clay-card-static {
+  box-shadow:
+    6px 6px 16px rgba(0, 0, 0, 0.3),
+    -3px -3px 10px rgba(45, 43, 85, 0.15),
+    inset 1px 1px 3px rgba(255, 255, 255, 0.05),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+  border-color: rgba(124, 92, 252, 0.15);
+  background: rgba(30, 28, 50, 0.8);
+}
+
+.dark .clay-card:hover {
+  box-shadow:
+    3px 3px 10px rgba(0, 0, 0, 0.35),
+    -2px -2px 6px rgba(45, 43, 85, 0.1),
+    inset 2px 2px 5px rgba(0, 0, 0, 0.2),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.05);
+}
+
+.dark .clay-button {
+  box-shadow:
+    4px 4px 12px rgba(0, 0, 0, 0.3),
+    -2px -2px 6px rgba(45, 43, 85, 0.1),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.dark .clay-icon {
+  box-shadow:
+    4px 4px 10px rgba(0, 0, 0, 0.25),
+    -2px -2px 6px rgba(45, 43, 85, 0.1),
+    inset 1px 1px 3px rgba(255, 255, 255, 0.05),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.dark .clay-stat {
+  box-shadow:
+    4px 4px 12px rgba(0, 0, 0, 0.3),
+    -2px -2px 8px rgba(45, 43, 85, 0.1),
+    inset 1px 1px 3px rgba(255, 255, 255, 0.05),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.15);
+  border-color: rgba(124, 92, 252, 0.2);
+}
+
+.dark .clay-input {
+  background: rgba(30, 28, 50, 0.6);
+  border-color: rgba(124, 92, 252, 0.2);
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.2),
+    inset -1px -1px 3px rgba(45, 43, 85, 0.1);
+  color: #ededed;
+}
+
+.dark .clay-input:focus {
+  border-color: rgba(124, 92, 252, 0.5);
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.25),
+    inset -1px -1px 3px rgba(45, 43, 85, 0.15),
+    0 0 0 3px rgba(124, 92, 252, 0.15);
+}
+
+.dark .clay-modal {
+  background: rgba(20, 18, 40, 0.95);
+  box-shadow:
+    10px 10px 30px rgba(0, 0, 0, 0.5),
+    -4px -4px 12px rgba(45, 43, 85, 0.1),
+    inset 1px 1px 3px rgba(255, 255, 255, 0.03);
+  border-color: rgba(124, 92, 252, 0.2);
+}
+
+.dark .clay-header {
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.03);
+  border-bottom-color: rgba(124, 92, 252, 0.1);
+  background: rgba(20, 18, 40, 0.7);
+}
+
+.dark .clay-badge {
+  box-shadow:
+    3px 3px 8px rgba(0, 0, 0, 0.25),
+    -1px -1px 4px rgba(45, 43, 85, 0.08),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.03);
+  border-color: rgba(124, 92, 252, 0.15);
+}
+
+.dark .clay-table-row:hover {
+  background: rgba(124, 92, 252, 0.08);
+}
+
+.dark .clay-accordion-btn:hover {
+  background: rgba(124, 92, 252, 0.08);
+}
+
+.dark .clay-dashed {
+  border-color: rgba(124, 92, 252, 0.2);
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.15),
+    inset -1px -1px 3px rgba(45, 43, 85, 0.05);
+}
+
+.dark .clay-dashed:hover {
+  border-color: rgba(124, 92, 252, 0.35);
+  background: rgba(124, 92, 252, 0.08);
+}
+
+.dark .landing-gradient {
+  background: linear-gradient(135deg, #141228 0%, #1a1735 30%, #1e1a2e 70%, #1c1528 100%);
+}
+
+.dark .text-clay-primary { color: #e0ddf5; }
+.dark .text-clay-secondary { color: #9b98b8; }
+
+/* ===== SEMANTIC BACKGROUND AND TEXT COLOR CLAY GRADIENTS ===== */
+
+/* Purple clay gradient (Total Variável) */
+.clay-bg-purple {
+  background: linear-gradient(135deg, #F0EDFF 0%, #E6E0FF 100%);
+}
+.dark .clay-bg-purple {
+  background: linear-gradient(135deg, #242145 0%, #1A1733 100%);
+}
+.text-clay-purple {
+  color: #7C5CFC;
+}
+.dark .text-clay-purple {
+  color: #a58eff;
+}
+
+/* Pink clay gradient (Total Fixo) */
+.clay-bg-pink {
+  background: linear-gradient(135deg, #FFF0F5 0%, #FFE0EB 100%);
+}
+.dark .clay-bg-pink {
+  background: linear-gradient(135deg, #3A2338 0%, #2A192A 100%);
+}
+.text-clay-pink {
+  color: #FF7EB3;
+}
+.dark .text-clay-pink {
+  color: #ff9ecf;
+}
+
+/* Teal clay gradient (Despesa Global) */
+.clay-bg-teal {
+  background: linear-gradient(135deg, #E8FFF9 0%, #D0FFF0 100%);
+}
+.dark .clay-bg-teal {
+  background: linear-gradient(135deg, #1C3A35 0%, #122825 100%);
+}
+.text-clay-teal {
+  color: #209684;
+}
+.dark .text-clay-teal {
+  color: #5CE0D8;
+}
+
+/* Orange clay gradient */
+.clay-bg-orange {
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+}
+.dark .clay-bg-orange {
+  background: linear-gradient(135deg, #3D2D1D 0%, #2B1F14 100%);
+}
+.text-clay-orange {
+  color: #FFB347;
+}
+.dark .text-clay-orange {
+  color: #ffcc70;
+}
+
+/* Generic container background (accordions, chart containers) */
+.clay-bg-container {
+  background: linear-gradient(135deg, rgba(240, 237, 255, 0.8) 0%, rgba(232, 224, 255, 0.6) 100%);
+}
+.dark .clay-bg-container {
+  background: linear-gradient(135deg, rgba(30, 28, 50, 0.8) 0%, rgba(20, 18, 35, 0.8) 100%);
+}
+
+/* Generic dialog background (modals, popups) */
+.clay-bg-dialog {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F8F6FF 100%);
+}
+.dark .clay-bg-dialog {
+  background: linear-gradient(135deg, #1E1C32 0%, #141223 100%);
+}
+
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(124, 92, 252, 0.2);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 92, 252, 0.35);
+}

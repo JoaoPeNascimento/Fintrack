@@ -28,13 +28,13 @@ export default async function ProfilePage() {
   const despesasFixas = despesasFixasData.success ? despesasFixasData.data : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+    <div className="min-h-screen landing-gradient transition-colors duration-300">
       
       {/* Header Navbar */}
-      <header className="w-full px-6 py-4 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border-b border-white/50 dark:border-gray-800/50 shadow-sm flex items-center justify-between sticky top-0 z-10 transition-colors duration-300">
+      <header className="clay-header w-full px-6 py-4 bg-white/50 flex items-center justify-between sticky top-0 z-10 transition-colors duration-300">
         <Link 
           href="/dashboard" 
-          className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+          className="flex items-center gap-2 text-[#7C5CFC] font-semibold hover:opacity-80 transition-opacity"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -53,29 +53,29 @@ export default async function ProfilePage() {
       <main className="flex flex-col items-center justify-center p-6 mt-4 sm:mt-10 gap-8 max-w-4xl mx-auto w-full">
         
         {/* User Profile Info Card */}
-        <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-8 transition-colors duration-300">
+        <div className="w-full clay-card-static bg-gradient-to-br from-[#F0EDFF]/80 to-[#E8E0FF]/60 p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-8 transition-colors duration-300">
           {session.user?.image ? (
             <img 
               src={session.user.image} 
               alt="Avatar" 
-              className="w-32 h-32 rounded-full border-4 border-indigo-100 dark:border-indigo-900 shadow-md object-cover"
+              className="w-32 h-32 rounded-full border-4 border-[#7C5CFC]/20 clay-icon object-cover"
             />
           ) : (
-            <div className="w-32 h-32 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center border-4 border-indigo-200 dark:border-indigo-800 shadow-md">
-              <span className="text-indigo-600 dark:text-indigo-400 font-extrabold text-5xl">
+            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#F0EDFF] to-[#E6E0FF] flex items-center justify-center clay-icon">
+              <span className="text-[#7C5CFC] font-extrabold text-5xl">
                 {session.user?.name?.charAt(0) || 'U'}
               </span>
             </div>
           )}
           
           <div className="flex flex-col text-center sm:text-left">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-1">
+            <h1 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-[#7C5CFC] to-[#FF7EB3] bg-clip-text text-transparent mb-1">
               {session.user?.name}
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 font-medium text-lg mb-4">
+            <p className="text-clay-secondary font-medium text-lg mb-4">
               {session.user?.email}
             </p>
-            <div className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-4 py-2 rounded-lg font-semibold text-sm self-center sm:self-start">
+            <div className="inline-flex items-center gap-2 bg-[#F0EDFF] clay-badge text-[#7C5CFC] px-4 py-2 font-semibold text-sm self-center sm:self-start">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
@@ -92,18 +92,20 @@ export default async function ProfilePage() {
         <DespesaFixaManager initialDespesas={despesasFixas} />
 
         {/* Monthly History Section */}
-        <div className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 p-8 sm:p-10 transition-colors duration-300">
+        <div className="w-full clay-card-static bg-gradient-to-br from-[#F0EDFF]/80 to-[#E8E0FF]/60 p-8 sm:p-10 transition-colors duration-300">
           <div className="mb-8">
-            <h2 className="text-2xl font-extrabold text-gray-800 dark:text-gray-100 mb-2 flex items-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-500 dark:text-indigo-400">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
+            <h2 className="text-2xl font-extrabold text-clay-primary mb-2 flex items-center gap-3">
+              <div className="clay-icon w-10 h-10 bg-gradient-to-br from-[#7C5CFC] to-[#9B7FFF] flex items-center justify-center rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
               Histórico de Gastos Mensais
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 font-medium">
+            <p className="text-clay-secondary font-medium">
               Selecione um mês para visualizar o detalhamento das despesas.
             </p>
           </div>

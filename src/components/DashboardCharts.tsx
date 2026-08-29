@@ -29,7 +29,7 @@ type DespesaFixa = {
   value: number;
 };
 
-const COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'];
+const COLORS = ['#7C5CFC', '#FF7EB3', '#FFB347', '#5CE0D8', '#9B7FFF', '#FF9ECF'];
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -57,8 +57,8 @@ const DashboardCharts = ({ gastos, despesasFixas }: { gastos: Gasto[], despesasF
     const totalFixas = despesasFixas.reduce((acc, d) => acc + d.value, 0);
 
     return [
-      { name: 'Fixas', valor: totalFixas, fill: '#ef4444' }, // Red-ish for fixed
-      { name: 'Variáveis', valor: totalGastos, fill: '#6366f1' }, // Indigo for variable
+      { name: 'Fixas', valor: totalFixas, fill: '#FF7EB3' },
+      { name: 'Variáveis', valor: totalGastos, fill: '#7C5CFC' },
     ];
   }, [gastos, despesasFixas]);
 
@@ -69,8 +69,8 @@ const DashboardCharts = ({ gastos, despesasFixas }: { gastos: Gasto[], despesasF
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
       {/* Gráfico Tipo de Pagamento */}
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 p-6 flex flex-col justify-center items-center transition-colors duration-300">
-        <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4 w-full text-left">
+      <div className="clay-card-static clay-bg-container p-6 flex flex-col justify-center items-center transition-colors duration-300">
+        <h3 className="text-lg font-bold text-clay-primary mb-4 w-full text-left">
           Despesas Variáveis por Tipo
         </h3>
         {pieData.length > 0 ? (
@@ -92,29 +92,29 @@ const DashboardCharts = ({ gastos, despesasFixas }: { gastos: Gasto[], despesasF
                 </Pie>
                 <Tooltip 
                   formatter={(value: any) => formatCurrency(Number(value))}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  contentStyle={{ borderRadius: '16px', border: '1px solid rgba(124,92,252,0.2)', boxShadow: '6px 6px 14px rgba(0,0,0,0.15)', background: 'var(--background)', color: 'var(--foreground)' }}
                 />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-400">Sem dados para exibir</div>
+          <div className="flex-1 flex items-center justify-center text-clay-secondary">Sem dados para exibir</div>
         )}
       </div>
 
       {/* Gráfico Fixas vs Variáveis */}
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 p-6 flex flex-col justify-center items-center transition-colors duration-300">
-        <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4 w-full text-left">
+      <div className="clay-card-static clay-bg-container p-6 flex flex-col justify-center items-center transition-colors duration-300">
+        <h3 className="text-lg font-bold text-clay-primary mb-4 w-full text-left">
           Fixas vs Variáveis
         </h3>
         <div className="w-full h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={barData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-              <XAxis dataKey="name" tick={{fill: '#6b7280'}} tickLine={false} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(124,92,252,0.1)" />
+              <XAxis dataKey="name" tick={{fill: '#6B6B8D'}} tickLine={false} axisLine={false} />
               <YAxis 
-                tick={{fill: '#6b7280'}} 
+                tick={{fill: '#6B6B8D'}} 
                 tickLine={false} 
                 axisLine={false}
                 tickFormatter={(val) => `R$${val}`}
@@ -123,9 +123,9 @@ const DashboardCharts = ({ gastos, despesasFixas }: { gastos: Gasto[], despesasF
               <Tooltip 
                 cursor={{fill: 'transparent'}}
                 formatter={(value: any) => formatCurrency(Number(value))}
-                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                contentStyle={{ borderRadius: '16px', border: '1px solid rgba(124,92,252,0.2)', boxShadow: '6px 6px 14px rgba(0,0,0,0.15)', background: 'var(--background)', color: 'var(--foreground)' }}
               />
-              <Bar dataKey="valor" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="valor" radius={[8, 8, 0, 0]}>
                  {barData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}

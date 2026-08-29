@@ -57,7 +57,6 @@ const DespesaFixaManager = ({ initialDespesas = [] }: { initialDespesas?: Despes
     }
   };
 
-  // Form State
   const [formData, setFormData] = useState({
     name: '',
     value: '',
@@ -89,11 +88,6 @@ const DespesaFixaManager = ({ initialDespesas = [] }: { initialDespesas?: Despes
 
       if (response.success) {
         toast.success(response.message || "Despesa salva com sucesso!");
-        
-        // At this point we could refetch, but let's just do a simple optimism or reload,
-        // Actually, revalidatePath will handle the server-side, but client state needs update.
-        // We can just refresh to keep it simple, or optimistically update.
-        // Doing a simple refresh since the page will re-render due to revalidatePath
         window.location.reload();
       } else {
         toast.error(response.message || "Erro ao salvar despesa.");
@@ -109,66 +103,70 @@ const DespesaFixaManager = ({ initialDespesas = [] }: { initialDespesas?: Despes
   return (
     <div className="w-full mb-8">
       {/* Accordion Container */}
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 dark:border-gray-700/50 overflow-hidden transition-colors duration-300">
+      <div className="clay-card-static clay-bg-pink overflow-hidden transition-colors duration-300">
         
         {/* Accordion Header */}
         <button 
           onClick={() => setIsAccordionOpen(!isAccordionOpen)}
-          className="w-full flex items-center justify-between p-6 sm:p-8 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          className="clay-accordion-btn w-full flex items-center justify-between p-6 sm:p-8 cursor-pointer"
         >
           <div className="flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-rose-500 dark:text-rose-400">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+            <div className="clay-icon w-10 h-10 bg-gradient-to-br from-[#FF7EB3] to-[#FF9ECF] flex items-center justify-center rounded-xl">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-clay-primary flex items-center gap-2">
               Despesas Fixas
-              <span className="bg-rose-100 text-rose-700 dark:bg-rose-900 dark:text-rose-300 text-xs py-1 px-2.5 rounded-full ml-2">
+              <span className="clay-badge bg-[#FFF0F5] dark:bg-[#3A2338] text-[#FF7EB3] dark:text-[#ff9ecf] text-xs py-1 px-2.5 ml-2">
                 {despesas.length}
               </span>
             </h2>
           </div>
           <div className={`transform transition-transform duration-300 ${isAccordionOpen ? 'rotate-180' : ''}`}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 dark:text-gray-400">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+            <div className="clay-icon w-8 h-8 bg-[#FFF0F5] dark:bg-[#3A2338] flex items-center justify-center rounded-full text-[#FF7EB3] dark:text-[#ff9ecf]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
           </div>
         </button>
 
         {/* Accordion Content */}
         <div className={`transition-all duration-500 ease-in-out ${isAccordionOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="p-6 sm:p-8 pt-0 border-t border-gray-100 dark:border-gray-700/50">
-            <p className="text-gray-500 dark:text-gray-400 mb-6 font-medium">
+          <div className="p-6 sm:p-8 pt-0 border-t border-[#FF7EB3]/10">
+            <p className="text-clay-secondary mb-6 font-medium">
               Cadastre contas recorrentes como Água, Luz, Internet e Aluguel. Elas aparecerão automaticamente consolidadas todo mês.
             </p>
 
             {despesas.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <div className="text-center py-8 text-clay-secondary">
                 Nenhuma despesa fixa cadastrada ainda.
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 {despesas.map((despesa) => (
-                  <div key={despesa._id} className="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow group flex flex-col justify-between">
+                  <div key={despesa._id} className="clay-card clay-bg-dialog p-5 flex flex-col justify-between group">
                     <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-bold text-lg text-gray-800 dark:text-gray-100 truncate pr-2">{despesa.name}</h4>
+                      <h4 className="font-bold text-lg text-clay-primary truncate pr-2">{despesa.name}</h4>
                       <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => openEditModal(despesa)} className="p-1.5 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-md transition-colors" title="Editar">
+                        <button onClick={() => openEditModal(despesa)} className="p-1.5 text-[#7C5CFC] hover:bg-[#F0EDFF] rounded-md transition-colors cursor-pointer" title="Editar">
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                         </button>
-                        <button onClick={() => handleDelete(despesa._id)} className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors" title="Excluir">
+                        <button onClick={() => handleDelete(despesa._id)} className="p-1.5 text-[#FF7EB3] hover:bg-[#FFF0F5] rounded-md transition-colors cursor-pointer" title="Excluir">
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
                       </div>
                     </div>
                     {despesa.description && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">{despesa.description}</p>
+                      <p className="text-sm text-clay-secondary mb-4 line-clamp-2">{despesa.description}</p>
                     )}
-                    <div className="mt-auto pt-2 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                      <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Valor Mensal</span>
-                      <span className="font-bold text-rose-600 dark:text-rose-400 text-lg">
+                    <div className="mt-auto pt-2 border-t border-[#FF7EB3]/10 flex justify-between items-center">
+                      <span className="text-xs font-semibold text-clay-secondary uppercase tracking-wider">Valor Mensal</span>
+                      <span className="font-bold text-[#FF7EB3] text-lg">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(despesa.value)}
                       </span>
                     </div>
@@ -179,7 +177,8 @@ const DespesaFixaManager = ({ initialDespesas = [] }: { initialDespesas?: Despes
 
             <button 
               onClick={openNewModal}
-              className="w-full py-4 border-2 border-dashed border-rose-300 dark:border-rose-700/50 rounded-xl text-rose-600 dark:text-rose-400 font-semibold hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors flex items-center justify-center gap-2"
+              className="clay-dashed w-full py-4 text-[#FF7EB3] dark:text-[#ff9ecf] font-semibold flex items-center justify-center gap-2 cursor-pointer"
+              style={{ borderColor: 'rgba(255, 126, 179, 0.25)' }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -196,43 +195,43 @@ const DespesaFixaManager = ({ initialDespesas = [] }: { initialDespesas?: Despes
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div 
-            className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
+            className="absolute inset-0 bg-[#2D2B55]/30 backdrop-blur-sm transition-opacity"
             onClick={closeModal}
           ></div>
           
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md z-10 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+          <div className="clay-modal clay-bg-dialog w-full max-w-md z-10 overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-[#FF7EB3]/10 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-clay-primary">
                 {editingDespesaId ? 'Editar Despesa Fixa' : 'Cadastrar Despesa Fixa'}
               </h3>
               <button 
                 onClick={closeModal}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                className="text-clay-secondary hover:text-clay-primary transition-colors clay-icon w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FFF0F5] dark:hover:bg-[#3A2338] cursor-pointer"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
               </button>
             </div>
             
-            <div className="p-6 overflow-y-auto">
+            <div className="p-6 overflow-y-auto custom-scrollbar">
               <form id="despesaFixaForm" onSubmit={handleSave} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome da Despesa</label>
+                  <label className="block text-sm font-medium text-clay-primary mb-1">Nome da Despesa</label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder="Ex: Aluguel, Internet..."
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                    className="clay-input w-full px-4 py-2.5 text-clay-primary placeholder:text-clay-secondary/50"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valor (R$)</label>
+                  <label className="block text-sm font-medium text-clay-primary mb-1">Valor (R$)</label>
                   <input
                     type="number"
                     name="value"
@@ -241,30 +240,30 @@ const DespesaFixaManager = ({ initialDespesas = [] }: { initialDespesas?: Despes
                     placeholder="Ex: 1500"
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none transition-shadow"
+                    className="clay-input w-full px-4 py-2.5 text-clay-primary placeholder:text-clay-secondary/50"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição (Opcional)</label>
+                  <label className="block text-sm font-medium text-clay-primary mb-1">Descrição (Opcional)</label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
                     placeholder="Ex: Aluguel do apartamento 102"
                     rows={3}
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none transition-shadow resize-none"
+                    className="clay-input w-full px-4 py-2.5 text-clay-primary placeholder:text-clay-secondary/50 resize-none"
                   />
                 </div>
               </form>
             </div>
             
-            <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3 bg-gray-50 dark:bg-gray-800/50">
+            <div className="p-6 border-t border-[#FF7EB3]/10 flex justify-end gap-3 bg-[#FFF0F5]/30 dark:bg-[#3A2338]/30">
               <button 
                 type="button"
                 onClick={closeModal}
-                className="px-5 py-2.5 rounded-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="clay-button px-5 py-2.5 font-medium text-clay-secondary bg-white/60 dark:bg-gray-800/60 hover:text-clay-primary cursor-pointer"
               >
                 Cancelar
               </button>
@@ -272,8 +271,8 @@ const DespesaFixaManager = ({ initialDespesas = [] }: { initialDespesas?: Despes
                 type="submit"
                 form="despesaFixaForm"
                 disabled={isSubmitting}
-                className={`px-5 py-2.5 rounded-lg font-medium text-white shadow-sm transition-colors ${
-                   isSubmitting ? 'bg-rose-400 cursor-not-allowed' : 'bg-rose-600 hover:bg-rose-700'
+                className={`clay-button px-5 py-2.5 font-medium text-white cursor-pointer ${
+                   isSubmitting ? 'bg-[#FF7EB3]/50 cursor-not-allowed' : 'bg-gradient-to-r from-[#FF7EB3] to-[#FF9ECF]'
                 }`}
               >
                 {isSubmitting ? 'Salvando...' : 'Salvar Despesa'}

@@ -26,29 +26,29 @@ export default async function DashboardPage() {
   const despesasFixas = despesasFixasData.success ? despesasFixasData.data : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+    <div className="min-h-screen landing-gradient transition-colors duration-300">
       
       {/* Header Navbar */}
-      <header className="w-full px-6 py-4 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border-b border-white/50 dark:border-gray-800/50 shadow-sm flex items-center justify-between sticky top-0 z-10 transition-colors duration-300">
+      <header className="clay-header w-full px-6 py-4 bg-white/50 flex items-center justify-between sticky top-0 z-10 transition-colors duration-300">
         <Link href="/profile" className="flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer">
           {session.user?.image ? (
             <img 
               src={session.user.image} 
               alt="Avatar" 
-              className="w-10 h-10 rounded-full border-2 border-indigo-200 shadow-sm"
+              className="w-10 h-10 rounded-full border-2 border-[#7C5CFC]/30 clay-icon"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center border-2 border-indigo-200">
-              <span className="text-indigo-600 font-bold">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#F0EDFF] to-[#E6E0FF] flex items-center justify-center clay-icon">
+              <span className="text-[#7C5CFC] font-bold">
                 {session.user?.name?.charAt(0) || 'U'}
               </span>
             </div>
           )}
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-gray-800 dark:text-gray-100 leading-tight">
+            <span className="text-sm font-bold text-clay-primary leading-tight">
               {session.user?.name}
             </span>
-            <span className="text-xs text-indigo-500 dark:text-indigo-400 font-medium hover:underline">
+            <span className="text-xs text-[#7C5CFC] font-medium hover:underline">
               Ver Perfil
             </span>
           </div>

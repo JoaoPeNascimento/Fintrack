@@ -41,20 +41,20 @@ export default function ExpensesSummaryAccordion({ gastos = [], despesasFixas = 
   if ((!gastos || gastos.length === 0) && (!despesasFixas || despesasFixas.length === 0)) return null;
 
   return (
-    <div className="w-full mt-6 bg-white/60 dark:bg-gray-800/40 backdrop-blur-md rounded-2xl shadow-sm border border-white/40 dark:border-gray-700/50 overflow-hidden transition-colors duration-300">
+    <div className="w-full mt-6 clay-card-static clay-bg-container overflow-hidden transition-colors duration-300">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-gray-50/80 dark:hover:bg-gray-700/50 transition-colors focus:outline-none"
+        className="clay-accordion-btn w-full flex items-center justify-between p-4 sm:p-5 text-left focus:outline-none cursor-pointer"
       >
         <div className="flex flex-col">
-          <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+          <span className="text-xs font-bold text-clay-secondary uppercase tracking-wider mb-1">
             Resumo Global do Mês
           </span>
-          <span className="text-xl font-bold text-red-600 dark:text-red-400 leading-none">
+          <span className="text-xl font-bold text-clay-pink leading-none">
             {formatCurrency(totalGlobal)}
           </span>
         </div>
-        <div className="flex items-center justify-center p-2 rounded-full bg-indigo-50 dark:bg-gray-700/50 text-indigo-500 transition-colors">
+        <div className="flex items-center justify-center p-2 rounded-full bg-[#F0EDFF] dark:bg-[#242145] clay-icon text-[#7C5CFC] dark:text-[#a58eff]">
           <svg
             className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
             fill="none"
@@ -70,34 +70,34 @@ export default function ExpensesSummaryAccordion({ gastos = [], despesasFixas = 
       <div 
         className={`transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
       >
-        <div className="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-700/50">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+        <div className="p-4 sm:p-5 border-t border-[#7C5CFC]/10">
+          <h3 className="text-sm font-semibold text-clay-primary mb-3">
             Detalhamento
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div className="bg-indigo-50/50 dark:bg-indigo-900/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
-               <span className="block text-xs text-indigo-500 dark:text-indigo-400 uppercase font-bold tracking-wider mb-1">Total Variável</span>
-               <span className="text-lg font-bold text-indigo-700 dark:text-indigo-300">{formatCurrency(totalGastos)}</span>
+            <div className="clay-icon clay-bg-purple p-3 rounded-xl">
+               <span className="block text-xs text-clay-purple uppercase font-bold tracking-wider mb-1">Total Variável</span>
+               <span className="text-lg font-bold text-clay-purple">{formatCurrency(totalGastos)}</span>
             </div>
-            <div className="bg-rose-50/50 dark:bg-rose-900/10 p-3 rounded-xl border border-rose-100 dark:border-rose-800/30">
-               <span className="block text-xs text-rose-500 dark:text-rose-400 uppercase font-bold tracking-wider mb-1">Total Fixo</span>
-               <span className="text-lg font-bold text-rose-700 dark:text-rose-300">{formatCurrency(totalFixas)}</span>
+            <div className="clay-icon clay-bg-pink p-3 rounded-xl">
+               <span className="block text-xs text-clay-pink uppercase font-bold tracking-wider mb-1">Total Fixo</span>
+               <span className="text-lg font-bold text-clay-pink">{formatCurrency(totalFixas)}</span>
             </div>
           </div>
           
-          <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">
+          <h4 className="text-xs font-semibold text-clay-secondary uppercase mb-3">
             Gastos Variáveis por Forma de Pagamento
           </h4>
           <div className="space-y-2">
             {Object.entries(expensesByMethod)
               .sort(([, a], [, b]) => b - a)
               .map(([method, value]) => (
-              <div key={method} className="flex justify-between items-center bg-white/50 dark:bg-gray-800/80 p-3 rounded-xl border border-gray-100/50 dark:border-gray-700/30">
-                <span className="text-sm text-gray-600 dark:text-gray-300 font-medium flex items-center gap-2">
-                   <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+              <div key={method} className="flex justify-between items-center bg-white/40 dark:bg-gray-800/40 clay-icon p-3 rounded-xl border border-white/20 dark:border-gray-800/20">
+                <span className="text-sm text-clay-primary font-medium flex items-center gap-2">
+                   <span className="w-1.5 h-1.5 rounded-full bg-[#7C5CFC]"></span>
                    {formatMethod(method)}
                 </span>
-                <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                <span className="text-sm font-bold text-clay-primary">
                   {formatCurrency(value)}
                 </span>
               </div>

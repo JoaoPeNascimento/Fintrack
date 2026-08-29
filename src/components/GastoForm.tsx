@@ -83,7 +83,7 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
         {/* Nome */}
         <div className="lg:col-span-4">
-          <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
+          <label htmlFor="name" className="block text-sm font-semibold text-clay-primary mb-1">
             Nome da Despesa
           </label>
           <input
@@ -92,13 +92,13 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
             id="name"
             placeholder="Ex: Supermercado"
             required
-            className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all outline-none bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+            className="clay-input w-full px-4 py-3 text-clay-primary placeholder:text-clay-secondary/50"
           />
         </div>
 
         {/* Valor */}
         <div className="lg:col-span-2">
-          <label htmlFor="value" className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
+          <label htmlFor="value" className="block text-sm font-semibold text-clay-primary mb-1">
             Valor (R$)
           </label>
           <input
@@ -109,13 +109,13 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
             min="0"
             placeholder="0.00"
             required
-            className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all outline-none bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+            className="clay-input w-full px-4 py-3 text-clay-primary placeholder:text-clay-secondary/50"
           />
         </div>
 
         {/* Data */}
         <div className="lg:col-span-2">
-          <label htmlFor="date" className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
+          <label htmlFor="date" className="block text-sm font-semibold text-clay-primary mb-1">
             Data
           </label>
           <input
@@ -124,13 +124,13 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
             id="date"
             defaultValue={new Date().toISOString().split('T')[0]}
             required
-            className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all outline-none bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+            className="clay-input w-full px-4 py-3 text-clay-primary"
           />
         </div>
 
         {/* Forma de Pagamento */}
         <div className={paymentMethod.startsWith('CARD_') ? "lg:col-span-2" : "lg:col-span-4"}>
-          <label htmlFor="payment_method" className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
+          <label htmlFor="payment_method" className="block text-sm font-semibold text-clay-primary mb-1">
             Pagamento
           </label>
           <select
@@ -139,7 +139,7 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
             value={paymentMethod}
             onChange={(e) => setPaymentMethod(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all outline-none bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E')] dark:bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px_12px] bg-[position:right_1rem_center] bg-no-repeat pr-10"
+            className="clay-input w-full px-4 py-3 text-clay-primary appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%237C5CFC%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px_12px] bg-[position:right_1rem_center] bg-no-repeat pr-10"
           >
             <option value="PIX">Pix</option>
             <option value="DINHEIRO">Dinheiro</option>
@@ -155,7 +155,7 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
         {/* Parcelas */}
         {paymentMethod.startsWith('CARD_') && (
           <div className="lg:col-span-2">
-            <label htmlFor="installments" className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
+            <label htmlFor="installments" className="block text-sm font-semibold text-clay-primary mb-1">
               Parcelas
             </label>
             <input
@@ -164,7 +164,7 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
               id="installments"
               min="1"
               defaultValue="1"
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all outline-none bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+              className="clay-input w-full px-4 py-3 text-clay-primary"
             />
           </div>
         )}
@@ -174,7 +174,7 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
         {/* Descrição */}
         <div className="lg:col-span-9">
-          <label htmlFor="description" className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
+          <label htmlFor="description" className="block text-sm font-semibold text-clay-primary mb-1">
             Descrição do Gasto (Opcional)
           </label>
           <input
@@ -182,7 +182,7 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
             name="description"
             id="description"
             placeholder="Adicione mais detalhes sobre essa despesa..."
-            className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all outline-none bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+            className="clay-input w-full px-4 py-3 text-clay-primary placeholder:text-clay-secondary/50"
           />
         </div>
 
@@ -191,7 +191,7 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
           <button
             type="submit"
             disabled={isPending}
-            className="w-full h-[50px] bg-gradient-to-r from-indigo-600 hover:from-indigo-700 to-purple-600 hover:to-purple-700 text-white font-bold px-4 rounded-xl shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/50 transition-all disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.98] flex items-center justify-center"
+            className="clay-button w-full h-[50px] bg-gradient-to-r from-[#7C5CFC] to-[#9B7FFF] text-white font-bold px-4 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
           >
             {isPending ? (gastoToEdit ? 'Atualizando...' : 'Registrando...') : (gastoToEdit ? 'Atualizar Gasto' : 'Registrar Gasto')}
           </button>
