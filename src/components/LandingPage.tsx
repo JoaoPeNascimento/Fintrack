@@ -63,100 +63,6 @@ function useScrollReveal() {
   return ref;
 }
 
-// ─── Feature Card ────────────────────────────────────────────────────
-function FeatureCard({ icon, title, description, variant, delay }: {
-  icon: string;
-  title: string;
-  description: string;
-  variant: string;
-  delay: string;
-}) {
-  const variantStyles: Record<string, { bg: string; iconBg: string; clay: string }> = {
-    purple: {
-      bg: 'bg-gradient-to-br from-[#F0EDFF] to-[#E6E0FF]',
-      iconBg: 'bg-gradient-to-br from-[#7C5CFC] to-[#9B7FFF]',
-      clay: 'clay-card',
-    },
-    pink: {
-      bg: 'bg-gradient-to-br from-[#FFF0F5] to-[#FFE0EB]',
-      iconBg: 'bg-gradient-to-br from-[#FF7EB3] to-[#FF9ECF]',
-      clay: 'clay-card clay-card-pink',
-    },
-    teal: {
-      bg: 'bg-gradient-to-br from-[#E8FFF9] to-[#D0FFF0]',
-      iconBg: 'bg-gradient-to-br from-[#5CE0D8] to-[#7EEEE6]',
-      clay: 'clay-card clay-card-teal',
-    },
-    orange: {
-      bg: 'bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5]',
-      iconBg: 'bg-gradient-to-br from-[#FFB347] to-[#FFCC70]',
-      clay: 'clay-card clay-card-orange',
-    },
-  };
-
-  const s = variantStyles[variant] || variantStyles.purple;
-
-  return (
-    <div className={`scroll-reveal ${delay} ${s.bg} ${s.clay} p-8 cursor-default group`}>
-      <div className={`${s.iconBg} clay-icon w-16 h-16 flex items-center justify-center text-3xl mb-6 mx-auto group-hover:scale-110 transition-transform duration-300`}>
-        {icon}
-      </div>
-      <h3 className="text-xl font-bold text-clay-primary text-center mb-3">{title}</h3>
-      <p className="text-clay-secondary text-center leading-relaxed text-[15px]">{description}</p>
-    </div>
-  );
-}
-
-// ─── Step Card ───────────────────────────────────────────────────────
-function StepCard({ number, title, description, delay }: {
-  number: number;
-  title: string;
-  description: string;
-  delay: string;
-}) {
-  return (
-    <div className={`scroll-reveal ${delay} flex flex-col items-center text-center group`}>
-      <div className="clay-step w-20 h-20 bg-gradient-to-br from-[#7C5CFC] to-[#9B7FFF] flex items-center justify-center text-white text-3xl font-black mb-6 group-hover:scale-110 transition-transform duration-300">
-        {number}
-      </div>
-      <h3 className="text-lg font-bold text-clay-primary mb-2">{title}</h3>
-      <p className="text-clay-secondary text-[15px] leading-relaxed max-w-[260px]">{description}</p>
-    </div>
-  );
-}
-
-// ─── Testimonial Card ────────────────────────────────────────────────
-function TestimonialCard({ name, role, quote, avatar, delay }: {
-  name: string;
-  role: string;
-  quote: string;
-  avatar: string;
-  delay: string;
-}) {
-  return (
-    <div className={`scroll-reveal ${delay} clay-card bg-gradient-to-br from-white to-[#F8F6FF] p-8`}>
-      <div className="flex items-center gap-4 mb-5">
-        <div className="clay-step w-12 h-12 bg-gradient-to-br from-[#7C5CFC] to-[#FF7EB3] flex items-center justify-center text-xl select-none">
-          {avatar}
-        </div>
-        <div>
-          <p className="font-bold text-clay-primary text-[15px]">{name}</p>
-          <p className="text-clay-secondary text-sm">{role}</p>
-        </div>
-      </div>
-      <p className="text-clay-secondary leading-relaxed text-[15px] italic">&ldquo;{quote}&rdquo;</p>
-      {/* Star rating */}
-      <div className="flex gap-1 mt-4">
-        {[...Array(5)].map((_, i) => (
-          <svg key={i} className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-          </svg>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // ─── Dashboard Mockup ────────────────────────────────────────────────
 function DashboardMockup() {
   return (
@@ -224,10 +130,7 @@ function DashboardMockup() {
 export default function LandingPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const featuresRef = useScrollReveal();
-  const stepsRef = useScrollReveal();
-  const testimonialsRef = useScrollReveal();
-  const ctaRef = useScrollReveal();
+  const saibaMaisRef = useScrollReveal();
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -272,13 +175,13 @@ export default function LandingPage() {
       </nav>
 
       {/* ───── Hero Section ───── */}
-      <section className="relative px-6 sm:px-10 pt-10 pb-20 sm:pt-16 sm:pb-28 max-w-7xl mx-auto">
+      <section className="relative px-6 sm:px-10 pt-6 pb-12 sm:pt-10 sm:pb-16 max-w-7xl mx-auto">
         <FloatingElements />
 
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-8 items-center">
           {/* Left: Copy */}
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
-            <div className="clay-icon bg-gradient-to-r from-[#F0EDFF] to-[#FFE0EB] px-5 py-2 mb-8 inline-flex items-center gap-2">
+            <div className="clay-icon bg-gradient-to-r from-[#F0EDFF] to-[#FFE0EB] px-5 py-2 mb-6 inline-flex items-center gap-2">
               <span className="text-sm">✨</span>
               <span className="text-sm font-semibold text-[#7C5CFC]">Grátis e fácil de usar</span>
             </div>
@@ -291,7 +194,7 @@ export default function LandingPage() {
               com facilidade
             </h1>
 
-            <p className="text-clay-secondary text-lg sm:text-xl max-w-lg leading-relaxed mb-10">
+            <p className="text-clay-secondary text-lg sm:text-xl max-w-lg leading-relaxed mb-8">
               O gerenciador financeiro mais simples e completo. Cadastre despesas, acompanhe seus gastos fixos e variáveis, e tenha visão total das suas finanças.
             </p>
 
@@ -310,7 +213,7 @@ export default function LandingPage() {
               </button>
 
               <a
-                href="#features"
+                href="#saiba-mais"
                 className="clay-button bg-white/70 text-clay-primary font-bold px-8 py-4 text-lg text-center cursor-pointer hover:bg-white/90"
               >
                 Saiba mais
@@ -325,163 +228,135 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ───── Features Section ───── */}
-      <section id="features" className="px-6 sm:px-10 py-20 sm:py-28 bg-white/30" ref={featuresRef}>
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 scroll-reveal">
-            <div className="clay-icon bg-gradient-to-r from-[#F0EDFF] to-[#E8E0FF] px-5 py-2 inline-flex items-center gap-2 mb-6">
-              <span className="text-sm">🚀</span>
-              <span className="text-sm font-semibold text-[#7C5CFC]">Funcionalidades</span>
+      {/* ───── Saiba Mais Section ───── */}
+      <section id="saiba-mais" className="px-6 sm:px-10 py-12 sm:py-16 bg-white/40 border-t border-[#E6E0FF]/60" ref={saibaMaisRef}>
+        <div className="max-w-5xl mx-auto space-y-12 sm:space-y-16">
+          {/* Header */}
+          <div className="text-center scroll-reveal">
+            <div className="clay-icon bg-gradient-to-r from-[#F0EDFF] to-[#E8E0FF] px-5 py-2 inline-flex items-center gap-2 mb-4">
+              <span className="text-sm">💡</span>
+              <span className="text-sm font-semibold text-[#7C5CFC]">Saiba Mais</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-clay-primary mb-4">
-              Por que escolher o{' '}
+            <h2 className="text-3xl sm:text-4xl font-black text-clay-primary mb-3">
+              Como funciona e por que usar o{' '}
               <span className="bg-gradient-to-r from-[#7C5CFC] to-[#FF7EB3] bg-clip-text text-transparent">
                 Fintrack
               </span>
-              ?
             </h2>
-            <p className="text-clay-secondary text-lg max-w-2xl mx-auto">
-              Tudo que você precisa para controlar suas finanças em um só lugar, sem complicação.
+            <p className="text-clay-secondary text-base sm:text-lg max-w-2xl mx-auto">
+              Entenda em detalhes o funcionamento da aplicação e como ela ajuda você a ter controle absoluto das suas finanças.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <FeatureCard
-              icon="📊"
-              title="Dashboard Inteligente"
-              description="Visualize todos os seus gastos com gráficos interativos e resumos automáticos do mês."
-              variant="purple"
-              delay="delay-100"
-            />
-            <FeatureCard
-              icon="💳"
-              title="Cartões Organizados"
-              description="Gerencie múltiplos cartões de crédito e acompanhe o quanto gasta em cada um."
-              variant="pink"
-              delay="delay-200"
-            />
-            <FeatureCard
-              icon="📌"
-              title="Despesas Fixas"
-              description="Cadastre contas recorrentes e nunca mais esqueça de um pagamento mensal."
-              variant="teal"
-              delay="delay-300"
-            />
-            <FeatureCard
-              icon="📈"
-              title="Relatórios Visuais"
-              description="Gráficos de pizza e barras para entender exatamente para onde vai seu dinheiro."
-              variant="orange"
-              delay="delay-400"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ───── How it Works Section ───── */}
-      <section className="px-6 sm:px-10 py-20 sm:py-28" ref={stepsRef}>
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16 scroll-reveal">
-            <div className="clay-icon bg-gradient-to-r from-[#FFF7ED] to-[#FFEDD5] px-5 py-2 inline-flex items-center gap-2 mb-6">
-              <span className="text-sm">⚡</span>
-              <span className="text-sm font-semibold text-[#FFB347]">Super simples</span>
+          {/* Block 1: Como Funciona */}
+          <div className="scroll-reveal space-y-6">
+            <div className="flex items-center gap-3 justify-center sm:justify-start">
+              <div className="clay-icon w-10 h-10 bg-gradient-to-br from-[#FFB347] to-[#FFCC70] flex items-center justify-center text-xl">
+                ⚡
+              </div>
+              <h3 className="text-2xl font-extrabold text-clay-primary">Como Funciona</h3>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-clay-primary mb-4">
-              Como funciona?
-            </h2>
-            <p className="text-clay-secondary text-lg max-w-xl mx-auto">
-              Três passos para começar a ter controle total das suas finanças.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
-            <StepCard
-              number={1}
-              title="Faça login com Google"
-              description="Entre com sua conta Google em um clique. Sem cadastros complicados."
-              delay="delay-100"
-            />
-            <StepCard
-              number={2}
-              title="Cadastre seus gastos"
-              description="Adicione despesas variáveis e fixas com nome, valor, data e forma de pagamento."
-              delay="delay-200"
-            />
-            <StepCard
-              number={3}
-              title="Acompanhe tudo"
-              description="Visualize gráficos, totais mensais e histórico completo no seu dashboard."
-              delay="delay-300"
-            />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="clay-card bg-gradient-to-br from-white to-[#F8F6FF] p-6 space-y-3">
+                <div className="clay-step w-10 h-10 bg-gradient-to-br from-[#7C5CFC] to-[#9B7FFF] flex items-center justify-center text-white font-bold text-lg">
+                  1
+                </div>
+                <h4 className="text-lg font-bold text-clay-primary">Acesso com 1 clique</h4>
+                <p className="text-clay-secondary text-sm leading-relaxed">
+                  Faça login instantâneo com a sua conta Google. Sem formulários nem confirmações de e-mail demoradas.
+                </p>
+              </div>
 
-          {/* Connector line (desktop only) */}
-          <div className="hidden md:block relative -mt-[170px] mb-[100px] mx-auto max-w-[600px]">
-            <div className="h-0.5 bg-gradient-to-r from-[#7C5CFC]/20 via-[#FF7EB3]/20 to-[#FFB347]/20 w-full" />
-          </div>
-        </div>
-      </section>
+              <div className="clay-card bg-gradient-to-br from-white to-[#F8F6FF] p-6 space-y-3">
+                <div className="clay-step w-10 h-10 bg-gradient-to-br from-[#FF7EB3] to-[#FF9ECF] flex items-center justify-center text-white font-bold text-lg">
+                  2
+                </div>
+                <h4 className="text-lg font-bold text-clay-primary">Cadastre suas Despesas</h4>
+                <p className="text-clay-secondary text-sm leading-relaxed">
+                  Adicione custos fixos (aluguel, contas) e variáveis (mercado, transporte) rapidamente com poucos cliques.
+                </p>
+              </div>
 
-      {/* ───── Testimonials Section ───── */}
-      <section className="px-6 sm:px-10 py-20 sm:py-28 bg-white/30" ref={testimonialsRef}>
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 scroll-reveal">
-            <div className="clay-icon bg-gradient-to-r from-[#E8FFF9] to-[#D0FFF0] px-5 py-2 inline-flex items-center gap-2 mb-6">
-              <span className="text-sm">💬</span>
-              <span className="text-sm font-semibold text-[#5CE0D8]">Depoimentos</span>
+              <div className="clay-card bg-gradient-to-br from-white to-[#F8F6FF] p-6 space-y-3">
+                <div className="clay-step w-10 h-10 bg-gradient-to-br from-[#5CE0D8] to-[#7EEEE6] flex items-center justify-center text-white font-bold text-lg">
+                  3
+                </div>
+                <h4 className="text-lg font-bold text-clay-primary">Visão Total e Relatórios</h4>
+                <p className="text-clay-secondary text-sm leading-relaxed">
+                  Acompanhe gráficos interativos e totais mensais no seu dashboard para manter o orçamento sob controle.
+                </p>
+              </div>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-clay-primary mb-4">
-              O que dizem nossos{' '}
-              <span className="bg-gradient-to-r from-[#5CE0D8] to-[#7C5CFC] bg-clip-text text-transparent">
-                usuários
-              </span>
-            </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <TestimonialCard
-              avatar="👩‍💻"
-              name="Ana Carolina"
-              role="Designer"
-              quote="Finalmente consegui entender para onde vai meu dinheiro! A interface é linda e super fácil de usar."
-              delay="delay-100"
-            />
-            <TestimonialCard
-              avatar="👨‍🎓"
-              name="Pedro Henrique"
-              role="Estudante"
-              quote="Como estudante, preciso controlar cada centavo. O Fintrack me ajuda demais com as despesas fixas."
-              delay="delay-200"
-            />
-            <TestimonialCard
-              avatar="👩‍💼"
-              name="Marina Santos"
-              role="Empreendedora"
-              quote="Os gráficos são incríveis. Consigo ver rapidamente meus maiores gastos e tomar decisões melhores."
-              delay="delay-300"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ───── CTA Final Section ───── */}
-      <section className="px-6 sm:px-10 py-20 sm:py-28" ref={ctaRef}>
-        <div className="max-w-3xl mx-auto text-center scroll-reveal">
-          <div className="clay-card bg-gradient-to-br from-[#7C5CFC]/10 to-[#FF7EB3]/10 p-10 sm:p-16">
-            <div className="clay-step w-20 h-20 bg-gradient-to-br from-[#7C5CFC] to-[#FF7EB3] flex items-center justify-center text-4xl mx-auto mb-8">
-              🚀
+          {/* Block 2: Por que Utilizar */}
+          <div className="scroll-reveal space-y-6">
+            <div className="flex items-center gap-3 justify-center sm:justify-start">
+              <div className="clay-icon w-10 h-10 bg-gradient-to-br from-[#7C5CFC] to-[#9B7FFF] flex items-center justify-center text-xl text-white">
+                🎯
+              </div>
+              <h3 className="text-2xl font-extrabold text-clay-primary">Por que utilizar a aplicação?</h3>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-clay-primary mb-4">
-              Pronto para organizar suas finanças?
-            </h2>
-            <p className="text-clay-secondary text-lg mb-10 max-w-lg mx-auto">
-              Comece agora mesmo. É grátis, rápido e não precisa de cadastro — basta sua conta Google.
-            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="clay-card bg-gradient-to-br from-[#F0EDFF] to-[#E6E0FF] p-6 flex items-start gap-4">
+                <div className="clay-icon w-12 h-12 bg-gradient-to-br from-[#7C5CFC] to-[#9B7FFF] flex items-center justify-center text-2xl shrink-0 text-white">
+                  📊
+                </div>
+                <div>
+                  <h4 className="text-lg font-bold text-clay-primary mb-1">Simplicidade sem Planilhas</h4>
+                  <p className="text-clay-secondary text-sm leading-relaxed">
+                    Esqueça planilhas complexas e fórmulas do Excel. Uma interface limpa e focada no que é essencial.
+                  </p>
+                </div>
+              </div>
+
+              <div className="clay-card clay-card-pink bg-gradient-to-br from-[#FFF0F5] to-[#FFE0EB] p-6 flex items-start gap-4">
+                <div className="clay-icon w-12 h-12 bg-gradient-to-br from-[#FF7EB3] to-[#FF9ECF] flex items-center justify-center text-2xl shrink-0 text-white">
+                  📌
+                </div>
+                <div>
+                  <h4 className="text-lg font-bold text-clay-primary mb-1">Clareza entre Gastos Fixos vs Variáveis</h4>
+                  <p className="text-clay-secondary text-sm leading-relaxed">
+                    Entenda quanto da sua renda está comprometida com contas recorrentes e quanto você ainda tem para gastar.
+                  </p>
+                </div>
+              </div>
+
+              <div className="clay-card clay-card-teal bg-gradient-to-br from-[#E8FFF9] to-[#D0FFF0] p-6 flex items-start gap-4">
+                <div className="clay-icon w-12 h-12 bg-gradient-to-br from-[#5CE0D8] to-[#7EEEE6] flex items-center justify-center text-2xl shrink-0 text-white">
+                  🔒
+                </div>
+                <div>
+                  <h4 className="text-lg font-bold text-clay-primary mb-1">100% Gratuito e Seguro</h4>
+                  <p className="text-clay-secondary text-sm leading-relaxed">
+                    Sua conta é autenticada de forma segura pelo Google. Sem mensalidades, anúncios ou custos ocultos.
+                  </p>
+                </div>
+              </div>
+
+              <div className="clay-card clay-card-orange bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] p-6 flex items-start gap-4">
+                <div className="clay-icon w-12 h-12 bg-gradient-to-br from-[#FFB347] to-[#FFCC70] flex items-center justify-center text-2xl shrink-0 text-white">
+                  🎨
+                </div>
+                <div>
+                  <h4 className="text-lg font-bold text-clay-primary mb-1">Interface Moderna e Dark Mode</h4>
+                  <p className="text-clay-secondary text-sm leading-relaxed">
+                    Design em Claymorphism atraente, responsivo e com suporte completo para modo claro e escuro.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Call to Action button inside Saiba Mais */}
+          <div className="scroll-reveal text-center pt-2">
             <button
               onClick={handleLogin}
-              className="clay-button animate-pulse-clay bg-gradient-to-r from-[#7C5CFC] to-[#9B7FFF] text-white font-bold px-10 py-4 text-lg cursor-pointer inline-flex items-center gap-3"
+              className="clay-button animate-pulse-clay bg-gradient-to-r from-[#7C5CFC] to-[#9B7FFF] text-white font-bold px-8 py-3.5 text-base cursor-pointer inline-flex items-center gap-3"
             >
-              <svg className="w-6 h-6" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#fff"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#e0e0ff"/>
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#ffe0eb"/>
@@ -494,7 +369,7 @@ export default function LandingPage() {
       </section>
 
       {/* ───── Footer ───── */}
-      <footer className="px-6 sm:px-10 py-10 border-t border-[#E6E0FF]/50">
+      <footer className="px-6 sm:px-10 py-8 border-t border-[#E6E0FF]/50">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="clay-icon w-8 h-8 bg-gradient-to-br from-[#7C5CFC] to-[#9B7FFF] flex items-center justify-center">
