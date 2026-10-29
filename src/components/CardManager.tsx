@@ -156,85 +156,77 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
   };
 
   return (
-    <div className="w-full mb-8">
-      {/* Accordion Container */}
-      <div className="clay-card-static clay-bg-container overflow-hidden transition-colors duration-300">
-        
-        {/* Accordion Header */}
-        <button 
-          onClick={() => setIsAccordionOpen(!isAccordionOpen)}
-          className="clay-accordion-btn w-full flex items-center justify-between p-6 sm:p-8 cursor-pointer"
-        >
-          <div className="flex items-center gap-3">
-            <div className="clay-icon w-10 h-10 bg-gradient-to-br from-[#7C5CFC] to-[#9B7FFF] flex items-center justify-center rounded-xl">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                <line x1="1" y1="10" x2="23" y2="10"></line>
-              </svg>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-clay-primary flex items-center gap-2">
-              Meus Cartões de Crédito
-              <span className="clay-badge bg-[#F0EDFF] dark:bg-[#242145] text-[#7C5CFC] dark:text-[#a58eff] text-xs py-1 px-2.5 ml-2">
-                {cards.length}
-              </span>
+    <section className="card w-full overflow-hidden">
+      {/* Accordion Header */}
+      <button
+        onClick={() => setIsAccordionOpen(!isAccordionOpen)}
+        aria-expanded={isAccordionOpen}
+        className="w-full flex items-center justify-between gap-4 px-5 py-4 sm:px-6 text-left hover:bg-surface-2/60 transition-colors cursor-pointer"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-fg flex items-center gap-2">
+              Cartões de crédito
+              <span className="badge num">{cards.length}</span>
             </h2>
+            <p className="text-sm text-muted">Limites, fechamento e vencimento.</p>
           </div>
-          <div className={`transform transition-transform duration-300 ${isAccordionOpen ? 'rotate-180' : ''}`}>
-            <div className="clay-icon w-8 h-8 bg-[#F0EDFF] dark:bg-[#242145] flex items-center justify-center rounded-full text-[#7C5CFC] dark:text-[#a58eff]">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-          </div>
-        </button>
+        </div>
+        <svg className={`w-5 h-5 text-muted transition-transform duration-200 ${isAccordionOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
 
-        {/* Accordion Content */}
-        <div className={`transition-all duration-500 ease-in-out ${isAccordionOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="p-6 sm:p-8 pt-0 border-t border-[#7C5CFC]/10">
-            
+      {/* Accordion Content */}
+      <div className={`grid transition-all duration-300 ease-in-out ${isAccordionOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+        <div className="overflow-hidden">
+          <div className="p-5 sm:p-6 border-t border-line">
+
             {cards.length === 0 ? (
-              <div className="text-center py-8 text-clay-secondary">
+              <div className="text-center py-6 text-sm text-muted">
                 Nenhum cartão cadastrado ainda.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
                 {cards.map((card) => (
-                  <div key={card.id} className={`p-5 rounded-xl shadow-lg bg-gradient-to-br ${colorStyles[card.color]} text-white relative overflow-hidden group clay-stat`} style={{ borderRadius: '16px' }}>
-                     {/* Decorative background shapes for card effect */}
-                    <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-white/10"></div>
-                    <div className="absolute right-12 -top-6 w-16 h-16 rounded-full bg-white/10"></div>
-                    
+                  <div key={card.id} className={`p-5 rounded-xl bg-gradient-to-br ${colorStyles[card.color]} text-white relative overflow-hidden shadow-sm`}>
                     <div className="flex justify-between items-start mb-6">
-                      <div className="font-medium tracking-widest text-white/80">CREDIT CARD</div>
-                      <div className="flex items-center gap-2 relative z-10">
-                        <button onClick={() => openEditCardModal(card)} className="p-1.5 bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-sm transition-colors text-white cursor-pointer" title="Editar">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      <div className="text-xs font-medium tracking-widest text-white/70">CRÉDITO</div>
+                      <div className="flex items-center gap-1 relative z-10">
+                        <button onClick={() => openEditCardModal(card)} className="p-1.5 hover:bg-white/20 rounded-md transition-colors text-white/90 cursor-pointer" title="Editar" aria-label={`Editar ${card.name}`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                         </button>
-                        <button onClick={() => handleDeleteCard(card.id)} className="p-1.5 bg-red-500/80 hover:bg-red-600 rounded-full backdrop-blur-sm transition-colors text-white cursor-pointer" title="Excluir">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        <button onClick={() => handleDeleteCard(card.id)} className="p-1.5 hover:bg-white/20 rounded-md transition-colors text-white/90 cursor-pointer" title="Excluir" aria-label={`Excluir ${card.name}`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
                       </div>
                     </div>
-                    
-                    <div className="text-lg font-bold truncate tracking-wider mb-1">
-                      {card.name.toUpperCase()}
+
+                    <div className="text-base font-semibold truncate tracking-wide mb-1">
+                      {card.name}
                     </div>
-                    
+
                     <div className="mt-4 flex justify-between items-end text-sm">
                       <div>
                         <div className="text-white/70 text-xs">Limite</div>
-                        <div className="font-semibold">
+                        <div className="num font-semibold">
                           R$ {card.limit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </div>
                       </div>
                       <div className="flex gap-4 text-right">
                         <div>
                           <div className="text-white/70 text-xs">Fecha</div>
-                          <div className="font-semibold">Dia {card.closingDay}</div>
+                          <div className="num font-semibold">Dia {card.closingDay}</div>
                         </div>
                         <div>
                           <div className="text-white/70 text-xs">Vence</div>
-                          <div className="font-semibold">Dia {card.dueDay}</div>
+                          <div className="num font-semibold">Dia {card.dueDay}</div>
                         </div>
                       </div>
                     </div>
@@ -243,17 +235,17 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
               </div>
             )}
 
-            <button 
+            <button
               onClick={openNewCardModal}
-              className="clay-dashed w-full py-4 text-[#7C5CFC] dark:text-[#a58eff] font-semibold flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3 rounded-lg border border-dashed border-line text-sm font-medium text-primary hover:bg-surface-2 transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
-              Cadastrar Novo Cartão
+              Adicionar cartão
             </button>
-            
+
           </div>
         </div>
       </div>
@@ -261,54 +253,38 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
       {/* Modal / Dialog Formulário */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div 
-            className="absolute inset-0 bg-[#2D2B55]/30 backdrop-blur-sm transition-opacity"
-            onClick={closeModal}
-          ></div>
-          
-          <div className="clay-modal clay-bg-dialog w-full max-w-lg z-10 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-[#7C5CFC]/10 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-clay-primary">
-                {editingCardId ? 'Editar Cartão' : 'Cadastrar Novo Cartão'}
+          <div className="overlay" onClick={closeModal}></div>
+
+          <div className="card relative w-full max-w-lg z-10 overflow-hidden flex flex-col max-h-[90vh] rounded-2xl shadow-xl" role="dialog" aria-modal="true">
+            <div className="px-6 py-4 border-b border-line flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-fg">
+                {editingCardId ? 'Editar cartão' : 'Novo cartão'}
               </h3>
-              <button 
-                onClick={closeModal}
-                className="text-clay-secondary hover:text-clay-primary transition-colors clay-icon w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F0EDFF] dark:hover:bg-[#242145] cursor-pointer"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <button onClick={closeModal} className="icon-btn" aria-label="Fechar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
               </button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto custom-scrollbar">
               {/* Card Preview */}
               <div className="mb-6 flex justify-center">
-                <div className={`w-full max-w-sm h-48 rounded-xl shadow-lg bg-gradient-to-br ${colorStyles[formData.color]} text-white relative overflow-hidden group p-6 flex flex-col justify-between transition-all duration-300 clay-stat`} style={{ borderRadius: '16px' }}>
-                  <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/10"></div>
-                  <div className="absolute right-12 -top-6 w-20 h-20 rounded-full bg-white/10"></div>
-                  
-                  <div className="flex justify-between items-start">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 48 32" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-80">
-                        <rect x="2" y="5" width="44" height="22" rx="4" fill="none"></rect>
-                        <line x1="2" y1="12" x2="46" y2="12"></line>
-                      </svg>
+                <div className={`w-full max-w-sm h-44 rounded-xl shadow-sm bg-gradient-to-br ${colorStyles[formData.color]} text-white relative overflow-hidden p-6 flex flex-col justify-between transition-all duration-300`}>
+                  <div className="text-xs font-medium tracking-widest text-white/70">CRÉDITO</div>
+
+                  <div className="text-lg font-semibold tracking-wide truncate">
+                    {formData.name || 'Nome do cartão'}
                   </div>
-                  
-                  <div className="flex-1 flex items-center">
-                     <div className="text-xl font-bold tracking-widest truncate opacity-90">
-                       {formData.name ? formData.name.toUpperCase() : 'NOME DO CARTÃO'}
-                     </div>
-                  </div>
-                  
+
                   <div className="flex justify-between items-end">
-                    <div className="text-sm font-medium">
+                    <div className="num text-sm font-medium">
                       R$ {formData.limit ? parseFloat(formData.limit).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}
                     </div>
-                    <div className="text-xs uppercase opacity-80 flex gap-3 text-right">
-                       <div><span className="block opacity-60 text-[10px]">Fecha</span>{formData.closingDay || '--'}</div>
-                       <div><span className="block opacity-60 text-[10px]">Vence</span>{formData.dueDay || '--'}</div>
+                    <div className="num text-xs flex gap-3 text-right">
+                       <div><span className="block text-white/60 text-[10px] uppercase">Fecha</span>{formData.closingDay || '--'}</div>
+                       <div><span className="block text-white/60 text-[10px] uppercase">Vence</span>{formData.dueDay || '--'}</div>
                     </div>
                   </div>
                 </div>
@@ -316,20 +292,20 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
 
               <form id="cardForm" onSubmit={handleSaveCard} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-clay-primary mb-1">Nome do Cartão (Apelido)</label>
+                  <label className="label">Nome do cartão</label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder="Ex: Nubank, Itaú Black..."
-                    className="clay-input w-full px-4 py-2.5 text-clay-primary placeholder:text-clay-secondary/50"
+                    className="input"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-clay-primary mb-1">Limite do Cartão (R$)</label>
+                  <label className="label">Limite (R$)</label>
                   <input
                     type="number"
                     name="limit"
@@ -338,14 +314,15 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
                     placeholder="Ex: 5000"
                     min="0"
                     step="0.01"
-                    className="clay-input w-full px-4 py-2.5 text-clay-primary placeholder:text-clay-secondary/50"
+                    inputMode="decimal"
+                    className="input num"
                     required
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-clay-primary mb-1">Dia do Fechamento</label>
+                    <label className="label">Dia do fechamento</label>
                     <input
                       type="number"
                       name="closingDay"
@@ -354,12 +331,12 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
                       placeholder="Ex: 5"
                       min="1"
                       max="31"
-                      className="clay-input w-full px-4 py-2.5 text-clay-primary placeholder:text-clay-secondary/50"
+                      className="input num"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-clay-primary mb-1">Dia do Vencimento</label>
+                    <label className="label">Dia do vencimento</label>
                     <input
                       type="number"
                       name="dueDay"
@@ -368,14 +345,14 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
                       placeholder="Ex: 12"
                       min="1"
                       max="31"
-                      className="clay-input w-full px-4 py-2.5 text-clay-primary placeholder:text-clay-secondary/50"
+                      className="input num"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-clay-primary mb-2">Cor de Personalização</label>
+                  <label className="label">Cor</label>
                   <div className="grid grid-cols-5 gap-3">
                     {(Object.keys(colorStyles) as CardColor[]).map((color) => (
                       <button
@@ -383,15 +360,15 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, color }))}
                         className={`
-                          h-12 rounded-lg bg-gradient-to-br ${colorStyles[color]} 
-                          flex items-center justify-center transition-all duration-200 clay-stat
-                          ${formData.color === color ? 'ring-2 ring-offset-2 ring-[#7C5CFC] scale-105' : 'opacity-70 hover:opacity-100'}
+                          h-10 rounded-lg bg-gradient-to-br ${colorStyles[color]}
+                          flex items-center justify-center transition-all duration-150 cursor-pointer
+                          ${formData.color === color ? 'ring-2 ring-offset-2 ring-offset-surface ring-primary' : 'opacity-70 hover:opacity-100'}
                         `}
-                        style={{ borderRadius: '12px' }}
                         aria-label={`Selecionar cor ${color}`}
+                        aria-pressed={formData.color === color}
                       >
                          {formData.color === color && (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white drop-shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-white">
                               <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
                          )}
@@ -401,30 +378,19 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
                 </div>
               </form>
             </div>
-            
-            <div className="p-6 border-t border-[#7C5CFC]/10 flex justify-end gap-3 bg-[#F0EDFF]/30 dark:bg-[#242145]/30">
-              <button 
-                type="button"
-                onClick={closeModal}
-                className="clay-button px-5 py-2.5 font-medium text-clay-secondary bg-white/60 dark:bg-gray-800/60 hover:text-clay-primary cursor-pointer"
-              >
+
+            <div className="px-6 py-4 border-t border-line flex justify-end gap-3">
+              <button type="button" onClick={closeModal} className="btn btn-ghost">
                 Cancelar
               </button>
-              <button 
-                type="submit"
-                form="cardForm"
-                disabled={isSubmitting}
-                className={`clay-button px-5 py-2.5 font-medium text-white cursor-pointer ${
-                   isSubmitting ? 'bg-[#7C5CFC]/50 cursor-not-allowed' : 'bg-gradient-to-r from-[#7C5CFC] to-[#9B7FFF]'
-                }`}
-              >
-                {isSubmitting ? 'Salvando...' : 'Salvar Cartão'}
+              <button type="submit" form="cardForm" disabled={isSubmitting} className="btn btn-primary">
+                {isSubmitting ? 'Salvando...' : 'Salvar cartão'}
               </button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

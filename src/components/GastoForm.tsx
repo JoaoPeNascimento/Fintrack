@@ -76,70 +76,71 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
     }
   }, [state, onSuccess]);
 
+  const isCard = paymentMethod.startsWith('CARD_');
+
   return (
-    <form ref={formRef} action={formAction} className="flex flex-col gap-4">
+    <form ref={formRef} action={formAction} className="flex flex-col gap-5">
       {gastoToEdit && <input type="hidden" name="id" value={gastoToEdit._id} />}
-      {/* First Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
+
+      <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
         {/* Nome */}
-        <div className="lg:col-span-4">
-          <label htmlFor="name" className="block text-sm font-semibold text-clay-primary mb-1">
-            Nome da Despesa
-          </label>
+        <div className="sm:col-span-3">
+          <label htmlFor="name" className="label">Descrição</label>
           <input
             type="text"
             name="name"
             id="name"
             placeholder="Ex: Supermercado"
             required
-            className="clay-input w-full px-4 py-3 text-clay-primary placeholder:text-clay-secondary/50"
+            autoFocus
+            className="input"
           />
         </div>
 
         {/* Valor */}
-        <div className="lg:col-span-2">
-          <label htmlFor="value" className="block text-sm font-semibold text-clay-primary mb-1">
-            Valor (R$)
-          </label>
-          <input
-            type="number"
-            name="value"
-            id="value"
-            step="0.01"
-            min="0"
-            placeholder="0.00"
-            required
-            className="clay-input w-full px-4 py-3 text-clay-primary placeholder:text-clay-secondary/50"
-          />
+        <div className="sm:col-span-2">
+          <label htmlFor="value" className="label">Valor</label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-muted">R$</span>
+            <input
+              type="number"
+              name="value"
+              id="value"
+              step="0.01"
+              min="0"
+              inputMode="decimal"
+              placeholder="0,00"
+              required
+              className="input num pl-10 text-right font-semibold text-base"
+            />
+          </div>
         </div>
+      </div>
 
+      <div className={`grid grid-cols-1 gap-4 ${isCard ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
         {/* Data */}
-        <div className="lg:col-span-2">
-          <label htmlFor="date" className="block text-sm font-semibold text-clay-primary mb-1">
-            Data
-          </label>
+        <div>
+          <label htmlFor="date" className="label">Data</label>
           <input
             type="date"
             name="date"
             id="date"
             defaultValue={new Date().toISOString().split('T')[0]}
             required
-            className="clay-input w-full px-4 py-3 text-clay-primary"
+            className="input"
           />
         </div>
 
         {/* Forma de Pagamento */}
-        <div className={paymentMethod.startsWith('CARD_') ? "lg:col-span-2" : "lg:col-span-4"}>
-          <label htmlFor="payment_method" className="block text-sm font-semibold text-clay-primary mb-1">
-            Pagamento
-          </label>
+        <div>
+          <label htmlFor="payment_method" className="label">Pagamento</label>
           <select
             name="payment_method"
             id="payment_method"
             value={paymentMethod}
             onChange={(e) => setPaymentMethod(e.target.value)}
             required
-            className="clay-input w-full px-4 py-3 text-clay-primary appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%237C5CFC%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px_12px] bg-[position:right_1rem_center] bg-no-repeat pr-10"
+            className="input appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px_16px] bg-[position:right_0.75rem_center] bg-no-repeat pr-10"
           >
             <option value="PIX">Pix</option>
             <option value="DINHEIRO">Dinheiro</option>
@@ -153,49 +154,44 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
         </div>
 
         {/* Parcelas */}
-        {paymentMethod.startsWith('CARD_') && (
-          <div className="lg:col-span-2">
-            <label htmlFor="installments" className="block text-sm font-semibold text-clay-primary mb-1">
-              Parcelas
-            </label>
+        {isCard && (
+          <div>
+            <label htmlFor="installments" className="label">Parcelas</label>
             <input
               type="number"
               name="installments"
               id="installments"
               min="1"
               defaultValue="1"
-              className="clay-input w-full px-4 py-3 text-clay-primary"
+              className="input num"
             />
           </div>
         )}
       </div>
 
-      {/* Second Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
-        {/* Descrição */}
-        <div className="lg:col-span-9">
-          <label htmlFor="description" className="block text-sm font-semibold text-clay-primary mb-1">
-            Descrição do Gasto (Opcional)
-          </label>
-          <input
-            type="text"
-            name="description"
-            id="description"
-            placeholder="Adicione mais detalhes sobre essa despesa..."
-            className="clay-input w-full px-4 py-3 text-clay-primary placeholder:text-clay-secondary/50"
-          />
-        </div>
+      {/* Descrição */}
+      <div>
+        <label htmlFor="description" className="label">
+          Observação <span className="font-normal text-muted">(opcional)</span>
+        </label>
+        <input
+          type="text"
+          name="description"
+          id="description"
+          placeholder="Adicione mais detalhes sobre essa despesa..."
+          className="input"
+        />
+      </div>
 
-        {/* Botão de Envio */}
-        <div className="lg:col-span-3">
-          <button
-            type="submit"
-            disabled={isPending}
-            className="clay-button w-full h-[50px] bg-gradient-to-r from-[#7C5CFC] to-[#9B7FFF] text-white font-bold px-4 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
-          >
-            {isPending ? (gastoToEdit ? 'Atualizando...' : 'Registrando...') : (gastoToEdit ? 'Atualizar Gasto' : 'Registrar Gasto')}
-          </button>
-        </div>
+      {/* Botão de Envio */}
+      <div className="flex justify-end pt-1">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="btn btn-accent w-full sm:w-auto sm:min-w-[180px] h-11"
+        >
+          {isPending ? (gastoToEdit ? 'Atualizando...' : 'Registrando...') : (gastoToEdit ? 'Salvar alterações' : 'Registrar despesa')}
+        </button>
       </div>
     </form>
   );
