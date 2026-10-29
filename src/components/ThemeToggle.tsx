@@ -9,7 +9,7 @@ export default function ThemeToggle() {
     // Check local storage or system preference on mount
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+
     if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
       setIsDarkMode(true);
       document.documentElement.classList.add('dark');
@@ -34,26 +34,20 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none clay-icon cursor-pointer ${
-        isDarkMode ? 'bg-[#7C5CFC]' : 'bg-[#E6E0FF]'
-      }`}
-      aria-label="Toggle Dark Mode"
+      className="icon-btn"
+      aria-label={isDarkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
+      title={isDarkMode ? 'Modo claro' : 'Modo escuro'}
     >
-      <span
-        className={`inline-block h-6 w-6 transform rounded-full bg-white shadow transition-transform flex items-center justify-center clay-step ${
-          isDarkMode ? 'translate-x-7' : 'translate-x-1'
-        }`}
-      >
-        {isDarkMode ? (
-          <svg className="w-3.5 h-3.5 text-[#7C5CFC]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-          </svg>
-        ) : (
-          <svg className="w-4 h-4 text-[#FFB347]" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 2.32a1 1 0 011.415 0l.708.707a1 1 0 01-1.414 1.415l-.707-.708a1 1 0 010-1.414zm3.78 4.68a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM10 16a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-4.22-2.32a1 1 0 01-1.414 0l-.707.708a1 1 0 011.414 1.414l.707-.707a1 1 0 010-1.415zM2 10a1 1 0 011-1h1a1 1 0 110 2H3a1 1 0 01-1-1zm2.32-4.22a1 1 0 010-1.415l.707-.707a1 1 0 011.414 1.414l-.708.707a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
-          </svg>
-        )}
-      </span>
+      {isDarkMode ? (
+        <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+        </svg>
+      ) : (
+        <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      )}
     </button>
   );
 }
