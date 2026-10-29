@@ -62,27 +62,25 @@ export default function MonthlyExpensesDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop overlay */}
-      <div 
-        className="absolute inset-0 bg-[#2D2B55]/30 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      ></div>
-      
+      <div className="overlay" onClick={onClose}></div>
+
       {/* Dialog body */}
-      <div className="clay-modal relative clay-bg-dialog w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
-        
+      <div className="card relative w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden rounded-2xl shadow-xl" role="dialog" aria-modal="true">
+
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[#7C5CFC]/10 bg-[#F0EDFF]/30 dark:bg-[#242145]/30">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-line">
           <div>
-            <h2 className="text-2xl font-extrabold bg-gradient-to-r from-[#7C5CFC] to-[#FF7EB3] bg-clip-text text-transparent">
+            <h2 className="text-lg font-semibold text-fg">
               Despesas de {label}
             </h2>
-            <p className="text-clay-secondary text-sm font-medium mt-1">
+            <p className="text-sm text-muted">
               Detalhamento de todos os gastos deste período
             </p>
           </div>
-          <button 
+          <button
             onClick={onClose}
-            className="text-clay-secondary hover:text-clay-primary clay-icon w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F0EDFF] dark:hover:bg-[#242145] transition-colors cursor-pointer"
+            className="icon-btn"
+            aria-label="Fechar"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -92,23 +90,21 @@ export default function MonthlyExpensesDialog({
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto custom-scrollbar">
+        <div className="overflow-y-auto custom-scrollbar">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="clay-step w-12 h-12 bg-gradient-to-br from-[#7C5CFC] to-[#9B7FFF] flex items-center justify-center">
-                <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
-              </div>
+              <div className="w-8 h-8 border-2 border-line border-t-primary rounded-full animate-spin"></div>
             </div>
           ) : (
             <ExpenseTable gastos={gastos} />
           )}
         </div>
-        
+
         {/* Footer */}
-        <div className="p-4 border-t border-[#7C5CFC]/10 bg-[#F0EDFF]/20 dark:bg-[#242145]/20 flex justify-end">
-          <button 
+        <div className="px-6 py-3 border-t border-line flex justify-end">
+          <button
             onClick={onClose}
-            className="clay-button px-6 py-2 bg-white/60 dark:bg-gray-800/60 text-clay-primary font-semibold cursor-pointer"
+            className="btn btn-ghost"
           >
             Fechar
           </button>

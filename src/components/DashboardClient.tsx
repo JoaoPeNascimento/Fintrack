@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import GastoForm from './GastoForm';
 import ExpenseTable from './ExpenseTable';
@@ -11,7 +11,7 @@ import ViewExpenseDetails from './ViewExpenseDetails';
 
 const DashboardCharts = dynamic(() => import('./DashboardCharts'), { 
   ssr: false, 
-  loading: () => <div className="animate-pulse h-[300px] bg-[#F0EDFF]/50 clay-card-static w-full m-6"></div> 
+  loading: () => <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full"><div className="card h-[340px] animate-pulse" /><div className="card h-[340px] animate-pulse" /></div> 
 });
 
 type Gasto = {
@@ -70,15 +70,19 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
   const formatter = useMemo(() => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }), []);
   const formatCurrency = useCallback((value: number) => formatter.format(value), [formatter]);
 
+  const fixedShare = totalGlobal > 0 ? (totalFixas / totalGlobal) * 100 : 0;
+  const variableShare = totalGlobal > 0 ? 100 - fixedShare : 0;
+  const monthLabel = useMemo(() => new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(new Date()), []);
+
   return (
-    <div className="flex flex-col items-center justify-center gap-8 w-full pb-24 relative">
+    <div className="flex flex-col gap-6 w-full pb-24 sm:pb-0 relative">
       <GastoModal 
         isOpen={isModalOpen} 
         onClose={handleCloseModal}
-        title={editingGasto ? 'Editar Gasto' : 'Adicionar Nova Despesa'}
+        title={editingGasto ? 'Editar despesa' : 'Nova despesa'}
       >
-        <p className="text-clay-secondary mb-6 font-medium">
-          {editingGasto ? 'Altere as informações da sua despesa.' : 'Preencha os dados abaixo para registrar no seu gerenciador financeiro.'}
+        <p className="text-sm text-muted mb-5">
+          {editingGasto ? 'Altere as informações da sua despesa.' : 'Registre um gasto variável em poucos segundos.'}
         </p>
         <GastoForm gastoToEdit={editingGasto} onSuccess={handleCloseModal} cards={cards} />
       </GastoModal>
@@ -86,115 +90,158 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
       <GastoModal 
         isOpen={isViewModalOpen} 
         onClose={handleCloseViewModal}
-        title="Detalhes"
+        title="Detalhes da despesa"
       >
         <ViewExpenseDetails gasto={viewingGasto} onClose={handleCloseViewModal} />
       </GastoModal>
 
-      {/* Hero Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-         <div className="clay-stat clay-bg-purple p-6 text-clay-primary">
-            <h3 className="text-xs sm:text-sm font-medium text-clay-purple mb-1 uppercase tracking-wider">Total Variável (Mês)</h3>
-            <p className="text-2xl sm:text-3xl font-extrabold text-clay-purple">{formatCurrency(totalGastos)}</p>
-         </div>
-         <div className="clay-stat clay-bg-pink p-6 text-clay-primary">
-            <h3 className="text-xs sm:text-sm font-medium text-clay-pink mb-1 uppercase tracking-wider">Total Fixo (Mês)</h3>
-            <p className="text-2xl sm:text-3xl font-extrabold text-clay-pink">{formatCurrency(totalFixas)}</p>
-         </div>
-         <div className="clay-stat clay-bg-teal p-6 text-clay-primary">
-            <h3 className="text-xs sm:text-sm font-medium text-clay-teal mb-1 uppercase tracking-wider">Despesa Global (Mês)</h3>
-            <p className="text-2xl sm:text-3xl font-extrabold text-clay-teal">{formatCurrency(totalGlobal)}</p>
-         </div>
+      {/* Page heading + primary action */}
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <p className="eyebrow first-letter:uppercase">{monthLabel}</p>
+          <h1 className="text-2xl font-semibold text-fg tracking-tight mt-1">Visão geral</h1>
+        </div>
+        <button onClick={handleOpenNew} className="btn btn-accent hidden sm:inline-flex">
+          <PlusIcon className="w-4 h-4" />
+          Nova despesa
+        </button>
       </div>
+
+      {/* Monthly summary */}
+      <section className="card p-5 sm:p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="lg:col-span-1">
+            <p className="text-sm font-medium text-muted">Total gasto no mês</p>
+            <p className="num text-3xl sm:text-4xl font-semibold text-fg tracking-tight mt-1">{formatCurrency(totalGlobal)}</p>
+            <p className="text-sm text-muted mt-1">
+              {gastos.length + despesasFixas.length} {gastos.length + despesasFixas.length === 1 ? 'lançamento' : 'lançamentos'}
+            </p>
+          </div>
+
+          <div className="lg:col-span-2 flex flex-col justify-center gap-4">
+            <div
+              className="flex h-2.5 w-full overflow-hidden rounded-full bg-surface-2"
+              role="img"
+              aria-label={`Fixas ${fixedShare.toFixed(0)}%, variáveis ${variableShare.toFixed(0)}%`}
+            >
+              <div className="bg-fixed transition-all duration-500" style={{ width: `${fixedShare}%` }} />
+              <div className="bg-variable transition-all duration-500" style={{ width: `${variableShare}%` }} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <SummaryItem colorClass="bg-fixed" label="Despesas fixas" value={formatCurrency(totalFixas)} share={fixedShare} count={despesasFixas.length} />
+              <SummaryItem colorClass="bg-variable" label="Gastos variáveis" value={formatCurrency(totalGastos)} share={variableShare} count={gastos.length} />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Charts */}
       <DashboardCharts gastos={gastos} despesasFixas={despesasFixas} />
 
       {/* Tables (Accordions) */}
       <div className="flex flex-col gap-6 w-full">
-        {/* Gastos Variáveis Accordion */}
-        <div className="w-full clay-card-static clay-bg-container overflow-hidden transition-colors duration-300">
-          <button
-            onClick={() => setIsGastosOpen(!isGastosOpen)}
-            className="clay-accordion-btn w-full flex items-center justify-between p-6 sm:p-8 text-left focus:outline-none cursor-pointer"
-          >
-            <div>
-              <h2 className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-[#7C5CFC] to-[#9B7FFF] bg-clip-text text-transparent">
-                Meus Gastos Variáveis
-              </h2>
-              <p className="text-sm text-clay-secondary font-medium mt-1">
-                Histórico detalhado das suas despesas variáveis.
-              </p>
-            </div>
-            <div className="flex items-center justify-center p-2.5 rounded-full bg-[#F0EDFF] dark:bg-[#242145] clay-icon text-[#7C5CFC] dark:text-[#a58eff]">
-              <svg
-                className={`w-6 h-6 transition-transform duration-300 ${isGastosOpen ? 'rotate-180' : ''}`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </button>
-          
-          <div className={`grid transition-all duration-300 ease-in-out ${isGastosOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-            <div className="overflow-hidden">
-              <div className="px-6 pb-6 sm:px-8 sm:pb-8 border-t border-[#7C5CFC]/10 pt-6">
-                <ExpenseTable gastos={gastos} onEdit={handleEdit} onViewClick={handleViewClick} />
-              </div>
-            </div>
-          </div>
-        </div>
+        <AccordionSection
+          title="Gastos variáveis"
+          subtitle="Compras e pagamentos avulsos do mês."
+          total={formatCurrency(totalGastos)}
+          dotClass="bg-variable"
+          isOpen={isGastosOpen}
+          onToggle={() => setIsGastosOpen(!isGastosOpen)}
+        >
+          <ExpenseTable gastos={gastos} onEdit={handleEdit} onViewClick={handleViewClick} />
+        </AccordionSection>
 
-        {/* Fixed Expenses Accordion */}
-        <div className="w-full clay-card-static clay-bg-pink overflow-hidden transition-colors duration-300">
-          <button
-            onClick={() => setIsDespesasOpen(!isDespesasOpen)}
-            className="clay-accordion-btn w-full flex items-center justify-between p-6 sm:p-8 text-left focus:outline-none cursor-pointer"
-          >
-            <div>
-              <h2 className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-[#FF7EB3] to-[#FFB347] bg-clip-text text-transparent">
-                Despesas Fixas
-              </h2>
-              <p className="text-sm text-clay-secondary font-medium mt-1">
-                Gerencie suas contas que vencem todo mês.
-              </p>
-            </div>
-            <div className="flex items-center justify-center p-2.5 rounded-full bg-[#FFF0F5] dark:bg-[#3A2338] clay-icon text-[#FF7EB3] dark:text-[#ff9ecf]">
-              <svg
-                className={`w-6 h-6 transition-transform duration-300 ${isDespesasOpen ? 'rotate-180' : ''}`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </button>
-          
-          <div className={`grid transition-all duration-300 ease-in-out ${isDespesasOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-            <div className="overflow-hidden">
-              <div className="px-6 pb-6 sm:px-8 sm:pb-8 border-t border-[#FF7EB3]/10 pt-6">
-                <FixedExpenseTable despesas={despesasFixas} onViewClick={handleViewClick} />
-              </div>
-            </div>
-          </div>
-        </div>
+        <AccordionSection
+          title="Despesas fixas"
+          subtitle="Contas recorrentes que vencem todo mês."
+          total={formatCurrency(totalFixas)}
+          dotClass="bg-fixed"
+          isOpen={isDespesasOpen}
+          onToggle={() => setIsDespesasOpen(!isDespesasOpen)}
+        >
+          <FixedExpenseTable despesas={despesasFixas} onViewClick={handleViewClick} />
+        </AccordionSection>
       </div>
 
-      {/* FAB - Floating Action Button */}
+      {/* FAB - mobile only */}
       <button
         onClick={handleOpenNew}
-        className="clay-button fixed bottom-6 right-6 sm:bottom-10 sm:right-10 z-40 bg-gradient-to-r from-[#7C5CFC] to-[#9B7FFF] text-white rounded-2xl w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center animate-pulse-clay group cursor-pointer"
-        aria-label="Adicionar Nova Despesa"
-        title="Adicionar Nova Despesa"
+        className="sm:hidden fixed bottom-5 right-5 z-40 btn btn-accent rounded-full h-14 px-5 shadow-lg"
+        aria-label="Adicionar nova despesa"
       >
-        <svg className="w-8 h-8 group-hover:rotate-90 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-        </svg>
+        <PlusIcon className="w-5 h-5" />
+        Nova despesa
       </button>
 
     </div>
+  );
+}
+
+function PlusIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 5v14m7-7H5" />
+    </svg>
+  );
+}
+
+function SummaryItem({ colorClass, label, value, share, count }: { colorClass: string; label: string; value: string; share: number; count: number }) {
+  return (
+    <div>
+      <div className="flex items-center gap-2 text-sm text-muted">
+        <span className={`w-2.5 h-2.5 rounded-sm ${colorClass}`} />
+        {label}
+        <span className="num text-xs">· {share.toFixed(0)}%</span>
+      </div>
+      <p className="num text-lg sm:text-xl font-semibold text-fg mt-1">{value}</p>
+      <p className="text-xs text-muted">{count} {count === 1 ? 'item' : 'itens'}</p>
+    </div>
+  );
+}
+
+function AccordionSection({ title, subtitle, total, dotClass, isOpen, onToggle, children }: {
+  title: string;
+  subtitle: string;
+  total: string;
+  dotClass: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <section className="card overflow-hidden">
+      <button
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        className="w-full flex items-center justify-between gap-4 px-5 py-4 sm:px-6 text-left hover:bg-surface-2/60 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary"
+      >
+        <div className="flex items-start gap-3 min-w-0">
+          <span className={`mt-2 w-2.5 h-2.5 rounded-sm shrink-0 ${dotClass}`} />
+          <div className="min-w-0">
+            <h2 className="text-base sm:text-lg font-semibold text-fg">{title}</h2>
+            <p className="text-sm text-muted">{subtitle}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
+          <span className="num text-sm sm:text-base font-semibold text-fg">{total}</span>
+          <svg
+            className={`w-5 h-5 text-muted transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </button>
+
+      <div className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+        <div className="overflow-hidden">
+          <div className="border-t border-line">
+            {children}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

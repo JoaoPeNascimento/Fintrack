@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useEffect, useState } from 'react';
 import {
   PieChart,
   Pie,
@@ -11,7 +11,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer
 } from 'recharts';
 
@@ -29,111 +28,164 @@ type DespesaFixa = {
   value: number;
 };
 
-const COLORS = ['#7C5CFC', '#FF7EB3', '#FFB347', '#5CE0D8', '#9B7FFF', '#FF9ECF'];
+// Recharts writes colors as SVG attributes, so the palette mirrors the CSS tokens in globals.css
+const PALETTE = {
+  light: { series: ['#1E3A8A', '#0891B2', '#64748B', '#3B82F6'], fixed: '#1E3A8A', variable: '#0891B2', grid: '#E2E8F0', tick: '#64748B', surface: '#FFFFFF', fg: '#0F172A' },
+  dark: { series: ['#60A5FA', '#22D3EE', '#94A3B8', '#818CF8'], fixed: '#60A5FA', variable: '#22D3EE', grid: '#1F2937', tick: '#94A3B8', surface: '#111827', fg: '#E5E7EB' },
+};
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const compactFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact', maximumFractionDigits: 1 });
+
+function useIsDark() {
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const root = document.documentElement;
+    const update = () => setIsDark(root.classList.contains('dark'));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
 
 const DashboardCharts = ({ gastos, despesasFixas }: { gastos: Gasto[], despesasFixas: DespesaFixa[] }) => {
-  
+  const isDark = useIsDark();
+  const colors = isDark ? PALETTE.dark : PALETTE.light;
+
   const pieData = useMemo(() => {
     const expensesByMethod = gastos.reduce((acc, gasto) => {
       let method = gasto.payment_method;
-      if (method.startsWith('CARD_')) method = 'Cartão';
+      if (method.startsWith('CARD_') || method === 'CARTAO') method = 'Cartão';
       else if (method === 'PIX') method = 'Pix';
       else if (method === 'DINHEIRO') method = 'Dinheiro';
-      
+
       acc[method] = (acc[method] || 0) + gasto.value;
       return acc;
     }, {} as Record<string, number>);
 
-    return Object.keys(expensesByMethod).map(key => ({
-      name: key,
-      value: expensesByMethod[key]
-    }));
+    return Object.keys(expensesByMethod)
+      .map(key => ({ name: key, value: expensesByMethod[key] }))
+      .sort((a, b) => b.value - a.value);
   }, [gastos]);
+
+  const totalVariable = useMemo(() => pieData.reduce((acc, d) => acc + d.value, 0), [pieData]);
 
   const barData = useMemo(() => {
     const totalGastos = gastos.reduce((acc, g) => acc + g.value, 0);
     const totalFixas = despesasFixas.reduce((acc, d) => acc + d.value, 0);
 
     return [
-      { name: 'Fixas', valor: totalFixas, fill: '#FF7EB3' },
-      { name: 'Variáveis', valor: totalGastos, fill: '#7C5CFC' },
+      { name: 'Fixas', valor: totalFixas, fill: colors.fixed },
+      { name: 'Variáveis', valor: totalGastos, fill: colors.variable },
     ];
-  }, [gastos, despesasFixas]);
+  }, [gastos, despesasFixas, colors]);
 
   const formatCurrency = (value: number) => {
     return currencyFormatter.format(value);
   };
 
+  const tooltipStyle = {
+    borderRadius: '8px',
+    border: `1px solid ${colors.grid}`,
+    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+    background: colors.surface,
+    color: colors.fg,
+    fontSize: '13px',
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
       {/* Gráfico Tipo de Pagamento */}
-      <div className="clay-card-static clay-bg-container p-6 flex flex-col justify-center items-center transition-colors duration-300">
-        <h3 className="text-lg font-bold text-clay-primary mb-4 w-full text-left">
-          Despesas Variáveis por Tipo
-        </h3>
+      <section className="card p-5 sm:p-6 flex flex-col">
+        <h3 className="text-base font-semibold text-fg">Gastos variáveis por pagamento</h3>
+        <p className="text-sm text-muted mb-4">Como você pagou neste mês.</p>
         {pieData.length > 0 ? (
-          <div className="w-full h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  formatter={(value: any) => formatCurrency(Number(value))}
-                  contentStyle={{ borderRadius: '16px', border: '1px solid rgba(124,92,252,0.2)', boxShadow: '6px 6px 14px rgba(0,0,0,0.15)', background: 'var(--background)', color: 'var(--foreground)' }}
-                />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="flex flex-col sm:flex-row items-center gap-6 flex-1">
+            <div className="relative w-48 h-48 shrink-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={62}
+                    outerRadius={88}
+                    paddingAngle={2}
+                    stroke={colors.surface}
+                    strokeWidth={2}
+                    dataKey="value"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={colors.series[index % colors.series.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value) => formatCurrency(Number(value))}
+                    contentStyle={tooltipStyle}
+                    itemStyle={{ color: colors.fg }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-xs text-muted">Total</span>
+                <span className="num text-sm font-semibold text-fg">{compactFormatter.format(totalVariable)}</span>
+              </div>
+            </div>
+            <ul className="w-full space-y-3">
+              {pieData.map((entry, index) => (
+                <li key={entry.name} className="flex items-center justify-between gap-3 text-sm">
+                  <span className="flex items-center gap-2 text-fg">
+                    <span className="w-2.5 h-2.5 rounded-sm" style={{ background: colors.series[index % colors.series.length] }} />
+                    {entry.name}
+                  </span>
+                  <span className="flex items-baseline gap-2">
+                    <span className="num font-semibold text-fg">{formatCurrency(entry.value)}</span>
+                    <span className="num text-xs text-muted w-10 text-right">
+                      {totalVariable > 0 ? `${((entry.value / totalVariable) * 100).toFixed(0)}%` : '0%'}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-clay-secondary">Sem dados para exibir</div>
+          <div className="flex-1 min-h-48 flex items-center justify-center text-sm text-muted">Sem gastos variáveis neste mês.</div>
         )}
-      </div>
+      </section>
 
       {/* Gráfico Fixas vs Variáveis */}
-      <div className="clay-card-static clay-bg-container p-6 flex flex-col justify-center items-center transition-colors duration-300">
-        <h3 className="text-lg font-bold text-clay-primary mb-4 w-full text-left">
-          Fixas vs Variáveis
-        </h3>
-        <div className="w-full h-64">
+      <section className="card p-5 sm:p-6 flex flex-col">
+        <h3 className="text-base font-semibold text-fg">Fixas vs. variáveis</h3>
+        <p className="text-sm text-muted mb-4">Comparativo do mês.</p>
+        <div className="w-full h-56">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={barData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(124,92,252,0.1)" />
-              <XAxis dataKey="name" tick={{fill: '#6B6B8D'}} tickLine={false} axisLine={false} />
-              <YAxis 
-                tick={{fill: '#6B6B8D'}} 
-                tickLine={false} 
+            <BarChart data={barData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="30%">
+              <CartesianGrid vertical={false} stroke={colors.grid} />
+              <XAxis dataKey="name" tick={{ fill: colors.tick, fontSize: 13 }} tickLine={false} axisLine={false} />
+              <YAxis
+                tick={{ fill: colors.tick, fontSize: 12 }}
+                tickLine={false}
                 axisLine={false}
-                tickFormatter={(val) => `R$${val}`}
-                width={80}
+                tickFormatter={(val) => compactFormatter.format(Number(val))}
+                width={72}
               />
-              <Tooltip 
-                cursor={{fill: 'transparent'}}
-                formatter={(value: any) => formatCurrency(Number(value))}
-                contentStyle={{ borderRadius: '16px', border: '1px solid rgba(124,92,252,0.2)', boxShadow: '6px 6px 14px rgba(0,0,0,0.15)', background: 'var(--background)', color: 'var(--foreground)' }}
+              <Tooltip
+                cursor={{ fill: colors.grid, opacity: 0.4 }}
+                formatter={(value) => formatCurrency(Number(value))}
+                contentStyle={tooltipStyle}
+                itemStyle={{ color: colors.fg }}
               />
-              <Bar dataKey="valor" radius={[8, 8, 0, 0]}>
-                 {barData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
+              <Bar dataKey="valor" name="Valor" radius={[4, 4, 0, 0]} maxBarSize={72}>
+                {barData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

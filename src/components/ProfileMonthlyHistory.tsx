@@ -12,44 +12,39 @@ interface MonthlySummaryItem {
   expenseCount: number;
 }
 
+const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
 export default function ProfileMonthlyHistory({ history }: { history: MonthlySummaryItem[] }) {
   const [selectedMonth, setSelectedMonth] = useState<MonthlySummaryItem | null>(null);
 
   if (!history || history.length === 0) {
     return (
-      <div className="text-center py-12 clay-card-static bg-[#F0EDFF]/30">
-        <p className="text-clay-secondary font-medium">Nenhum histórico de gastos encontrado.</p>
+      <div className="text-center py-10 rounded-lg border border-dashed border-line">
+        <p className="text-sm text-muted">Nenhum histórico de gastos encontrado.</p>
       </div>
     );
   }
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {history.map((item, index) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        {history.map((item) => (
           <button
             key={`${item.year}-${item.month}`}
             onClick={() => setSelectedMonth(item)}
-            className="clay-card flex flex-col text-left clay-bg-dialog p-5 transition-all group relative overflow-hidden cursor-pointer"
+            className="group flex flex-col text-left rounded-lg border border-line bg-surface p-4 hover:border-primary/40 hover:bg-surface-2/50 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-primary"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 clay-bg-purple rounded-bl-full -z-10 opacity-30 transition-transform duration-300 group-hover:scale-110"></div>
-            
-            <span className="text-sm font-bold text-clay-purple mb-1 tracking-wide uppercase">
+            <span className="text-sm font-medium text-muted first-letter:uppercase">
               {item.label}
             </span>
-            
-            <span className="text-2xl font-extrabold text-clay-primary mb-3 transition-colors duration-300">
-              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.totalAmount)}
+
+            <span className="num text-xl font-semibold text-fg mt-1">
+              {currencyFormatter.format(item.totalAmount)}
             </span>
-            
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-clay-secondary clay-badge bg-[#F0EDFF] dark:bg-[#242145] px-2.5 py-1 self-start">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#7C5CFC] dark:text-[#a58eff]">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-              {item.expenseCount} {item.expenseCount === 1 ? 'gasto' : 'gastos'}
+
+            <span className="mt-3 flex items-center justify-between text-xs text-muted">
+              <span>{item.expenseCount} {item.expenseCount === 1 ? 'gasto' : 'gastos'}</span>
+              <span className="text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">Ver detalhes →</span>
             </span>
           </button>
         ))}
