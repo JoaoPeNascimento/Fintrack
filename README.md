@@ -43,14 +43,22 @@ O servidor Next.js assina, a cada chamada, um JWT HS256 de 5 minutos (`sub` = e-
 
 ## Rodando localmente
 
-```bash
-# 1. MongoDB + backend
-export BACKEND_JWT_SECRET="um-segredo-com-pelo-menos-32-caracteres"
-docker compose up --build
-#    ou, sem Docker para o backend:
-cd backend && ./mvnw -pl fintrack-infrastructure -am spring-boot:run
+### Tudo com Docker
 
-# 2. Front-end (com as variáveis acima em frontend/.env.local)
+```bash
+cp .env.example .env   # preencha os valores
+docker compose up --build
+```
+
+Sobe MongoDB (`27017`), backend (`8080`, ou `BACKEND_PORT`) e front (`http://localhost:3000`).
+
+### Sem Docker para o app
+
+```bash
+docker compose up mongo
+cd backend && ./mvnw -pl fintrack-infrastructure -am spring-boot:run   # requer MONGODB_URI e BACKEND_JWT_SECRET
+
+# Front-end (com as variáveis em frontend/.env)
 cd frontend
 npm install
 npm run dev

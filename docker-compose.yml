@@ -1,4 +1,5 @@
-# Ambiente local: MongoDB + backend Spring Boot. O front roda com `npm run dev` dentro de frontend/.
+# Ambiente local completo: MongoDB + backend Spring Boot + front Next.js.
+# As variáveis vêm do .env na raiz (veja .env.example).
 services:
   mongo:
     image: mongo:7
@@ -12,11 +13,25 @@ services:
     depends_on:
       - mongo
     ports:
-      - "8080:8080"
+      - "${BACKEND_PORT:-8080}:8080"
     environment:
       MONGODB_URI: mongodb://mongo:27017/fintrack
       BACKEND_JWT_SECRET: ${BACKEND_JWT_SECRET:?defina BACKEND_JWT_SECRET (min. 32 caracteres)}
       APP_TIMEZONE: America/Sao_Paulo
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    environment:
+      BACKEND_URL: http://backend:8080
+      BACKEND_JWT_SECRET: ${BACKEND_JWT_SECRET:?defina BACKEND_JWT_SECRET (min. 32 caracteres)}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?defina GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?defina GOOGLE_CLIENT_SECRET}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?defina NEXTAUTH_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
 
 volumes:
   mongo-data:

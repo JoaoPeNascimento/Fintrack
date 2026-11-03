@@ -4,3 +4,4 @@
 *.pem
 .idea/
 .vscode/
+!.env.example
