@@ -1,4 +1,4 @@
-# Ambiente local: MongoDB + backend Spring Boot. O front roda com `npm run dev`.
+# Ambiente local: MongoDB + backend Spring Boot. O front roda com `npm run dev` dentro de frontend/.
 services:
   mongo:
     image: mongo:7

@@ -6,7 +6,7 @@ Gerenciador financeiro pessoal: gastos variáveis (à vista e parcelados), cart�
 Navegador ──► Next.js (UI + NextAuth/Google + Server Actions) ──JWT──► Spring Boot API ──► MongoDB
 ```
 
-- **Front-end** (`/`): Next.js 16. Faz o login com Google e chama o backend a partir de Server Actions (`src/actions/*`), via `src/lib/backend.ts`.
+- **Front-end** (`/frontend`): Next.js 16. Faz o login com Google e chama o backend a partir de Server Actions (`frontend/src/actions/*`), via `frontend/src/lib/backend.ts`.
 - **Backend** (`/backend`): Java 21 + Spring Boot 3.5 em Clean Architecture. É o dono das regras de negócio e do acesso ao banco.
 
 ## Backend: arquitetura
@@ -50,7 +50,8 @@ docker compose up --build
 #    ou, sem Docker para o backend:
 cd backend && ./mvnw -pl fintrack-infrastructure -am spring-boot:run
 
-# 2. Front-end (com as variáveis acima em .env.local)
+# 2. Front-end (com as variáveis acima em frontend/.env.local)
+cd frontend
 npm install
 npm run dev
 ```
@@ -59,7 +60,7 @@ npm run dev
 
 ```bash
 cd backend && ./mvnw verify   # unitários, ArchUnit, MockMvc e MongoDB via Testcontainers (requer Docker)
-npm run build                 # front-end
+cd frontend && npm run build  # front-end
 ```
 
 ## Deploy
