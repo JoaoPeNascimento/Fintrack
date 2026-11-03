@@ -1,281 +1,110 @@
 'use server';
 
-import dbConnect from '@/lib/mongoose';
-import Gasto from '@/models/Gasto';
 import { revalidatePath } from 'next/cache';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { backendFetch, errorMessage, toLegacyIsoDate } from '@/lib/backend';
 
-export async function createGasto(prevState: any, formData: FormData) {
+type BackendExpense = {
+  id: string;
+  name: string;
+  description: string | null;
+  value: number;
+  date: string | null;
+  paymentMethod: 'CARTAO' | 'PIX' | 'DINHEIRO';
+  installments: number;
+  cardId: string | null;
+};
+
+type MonthlySummary = {
+  month: number;
+  year: number;
+  label: string;
+  shortLabel: string;
+  totalAmount: number;
+  expenseCount: number;
+};
+
+function toPlainGasto(g: BackendExpense) {
+  return {
+    _id: g.id,
+    name: g.name,
+    value: g.value,
+    date: toLegacyIsoDate(g.date),
+    payment_method: g.paymentMethod,
+    installments: g.installments,
+    description: g.description ?? undefined,
+    cardId: g.cardId ?? undefined,
+  };
+}
+
+function revalidate() {
+  revalidatePath('/dashboard');
+  revalidatePath('/profile');
+}
+
+export async function createGasto(_prevState: unknown, formData: FormData) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session || !session.user?.email) {
-      throw new Error("You must be logged in to create an expense.");
-    }
-    
-    // We already retrieve User._id into session.user.id in the NextAuth configuration
-    const userId = (session.user as any).id;
-
-    if (!userId) {
-       throw new Error("User ID could not be found.");
-    }
-
-    await dbConnect();
-
     const id = formData.get('id') as string;
-    const name = formData.get('name') as string;
-    const valueStr = formData.get('value') as string;
-    let value = parseFloat(valueStr);
-    const dateStr = formData.get('date') as string;
-    const date = dateStr ? new Date(dateStr) : new Date();
     const installmentsStr = formData.get('installments') as string;
-    const installments = installmentsStr ? parseInt(installmentsStr, 10) : 1;
-    const description = formData.get('description') as string;
-    
-    let payment_method = formData.get('payment_method') as string;
-    let cardId: string | undefined = undefined;
 
-    if (payment_method && payment_method.startsWith('CARD_')) {
-      cardId = payment_method.replace('CARD_', '');
-      payment_method = 'CARTAO';
-    }
-
-    if (!id && payment_method === 'CARTAO' && installments > 1) {
-      value = value / installments;
-    }
+    // The backend applies the business rules (installment split, "CARD_<id>" parsing, defaults)
+    const body = {
+      name: formData.get('name') as string,
+      value: parseFloat(formData.get('value') as string),
+      date: (formData.get('date') as string) || null,
+      paymentMethod: formData.get('payment_method') as string,
+      installments: installmentsStr ? parseInt(installmentsStr, 10) : 1,
+      description: formData.get('description') as string,
+    };
 
     if (id) {
-      await Gasto.updateOne({ _id: id, userId }, {
-        name,
-        value,
-        date,
-        payment_method,
-        installments,
-        description,
-        cardId,
-      });
-      revalidatePath('/dashboard');
-      revalidatePath('/profile');
+      await backendFetch(`/expenses/${encodeURIComponent(id)}`, { method: 'PUT', body });
+      revalidate();
       return { success: true, message: 'Gasto atualizado com sucesso!' };
-    } else {
-      const newGasto = new Gasto({
-        name,
-        value,
-        date,
-        payment_method,
-        installments,
-        description,
-        cardId,
-        userId,
-      });
-
-      await newGasto.save();
-      
-      // Invalidate the cache for the dashboard page so new data appears
-      revalidatePath('/dashboard');
-      revalidatePath('/profile');
-      
-      return { success: true, message: 'Gasto registrado com sucesso!' };
     }
-  } catch (error: any) {
-    return { success: false, message: error.message || 'Failed to create expense.' };
+
+    await backendFetch('/expenses', { method: 'POST', body });
+    revalidate();
+    return { success: true, message: 'Gasto registrado com sucesso!' };
+  } catch (error) {
+    return { success: false, message: errorMessage(error, 'Falha ao registrar gasto.') };
   }
 }
 
 export async function getUserGastos() {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session || !session.user?.email) {
-      return { success: false, data: [] };
-    }
-    
-    const userId = (session.user as any).id;
-    if (!userId) {
-      return { success: false, data: [] };
-    }
-
-    await dbConnect();
-
-    // Fetch all for user and sort by date descending
-    const allGastos = await Gasto.find({ userId }).sort({ date: -1 }).lean();
-
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
-
-    const gastos = allGastos.filter((g: any) => {
-      if (!g.date) return false;
-      
-      const gDate = new Date(g.date);
-      const gYear = gDate.getFullYear();
-      const gMonth = gDate.getMonth();
-
-      // Gastos do mês atual (ou futuros)
-      if (gYear > currentYear || (gYear === currentYear && gMonth >= currentMonth)) {
-        return true;
-      }
-
-      // Gastos de meses anteriores com > 1 parcela
-      if (g.installments && g.installments > 1) {
-        const monthsPassed = (currentYear - gYear) * 12 + (currentMonth - gMonth);
-        // Só continua aparecendo se o número de meses que se passaram 
-        // for menor que o total de parcelas
-        return monthsPassed < g.installments;
-      }
-
-      return false;
-    });
-
-    const plainGastos = gastos.map((g: any) => ({
-      _id: g._id?.toString(),
-      name: g.name,
-      value: g.value,
-      date: g.date ? new Date(g.date).toISOString() : null,
-      payment_method: g.payment_method,
-      installments: g.installments,
-      description: g.description,
-      cardId: g.cardId,
-    }));
-
-    return { success: true, data: plainGastos };
-  } catch (error: any) {
+    const gastos = await backendFetch<BackendExpense[]>('/expenses/active');
+    return { success: true, data: gastos.map(toPlainGasto) };
+  } catch {
     return { success: false, data: [] };
   }
 }
 
 export async function getMonthlyExpenseSummary() {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session || !session.user?.email) {
-      return { success: false, data: [] };
-    }
-    
-    const userId = (session.user as any).id;
-    if (!userId) {
-      return { success: false, data: [] };
-    }
-
-    await dbConnect();
-
-    // Group expenses by month and year using MongoDB aggregation
-    const pipeline = [
-      { $match: { userId: userId } },
-      {
-        $group: {
-          _id: {
-            year: { $year: "$date" },
-            month: { $month: "$date" }
-          },
-          totalAmount: { $sum: "$value" },
-          count: { $sum: 1 }
-        }
-      },
-      {
-        $sort: {
-          "_id.year": -1 as const,
-          "_id.month": -1 as const
-        }
-      }
-    ];
-
-    const results = await Gasto.aggregate(pipeline);
-
-    // Format the results for the frontend
-    const formattedData = results.map((result: any) => {
-      const monthStr = result._id.month.toString().padStart(2, '0');
-      const yearStr = result._id.year.toString();
-      
-      const monthNames = [
-        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-      ];
-      
-      return {
-        month: result._id.month,
-        year: result._id.year,
-        label: `${monthNames[result._id.month - 1]} ${yearStr}`,
-        shortLabel: `${monthStr}/${yearStr}`,
-        totalAmount: result.totalAmount,
-        expenseCount: result.count
-      };
-    });
-
-    return { success: true, data: formattedData };
-  } catch (error: any) {
+    const data = await backendFetch<MonthlySummary[]>('/expenses/monthly-summary');
+    return { success: true, data };
+  } catch {
     return { success: false, data: [] };
   }
 }
 
 export async function getExpensesByMonthAndYear(month: number, year: number) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session || !session.user?.email) {
-      return { success: false, data: [] };
-    }
-    
-    const userId = (session.user as any).id;
-    if (!userId) {
-      return { success: false, data: [] };
-    }
-
-    await dbConnect();
-
-    // Create date boundaries for the query
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
-
-    const gastos = await Gasto.find({ 
-      userId,
-      date: { $gte: startDate, $lte: endDate }
-    }).sort({ date: -1 }).lean();
-
-    const plainGastos = gastos.map((g: any) => ({
-      _id: g._id?.toString(),
-      name: g.name,
-      value: g.value,
-      date: g.date ? g.date.toISOString() : null,
-      payment_method: g.payment_method,
-      installments: g.installments,
-      description: g.description,
-      cardId: g.cardId,
-    }));
-
-    return { success: true, data: plainGastos };
-  } catch (error: any) {
+    const gastos = await backendFetch<BackendExpense[]>(`/expenses?month=${month}&year=${year}`);
+    return { success: true, data: gastos.map(toPlainGasto) };
+  } catch {
     return { success: false, data: [] };
   }
 }
 
 export async function deleteGasto(id: string) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session || !session.user?.email) {
-      return { success: false, message: 'Não autorizado.' };
-    }
-    
-    const userId = (session.user as any).id;
-    if (!userId) {
-      return { success: false, message: 'Usuário não encontrado.' };
-    }
+    await backendFetch(`/expenses/${encodeURIComponent(id)}`, { method: 'DELETE' });
 
-    await dbConnect();
-
-    const result = await Gasto.deleteOne({ _id: id, userId });
-
-    if (result.deletedCount === 0) {
-      return { success: false, message: 'Gasto não encontrado ou não autorizado.' };
-    }
-
-    revalidatePath('/dashboard');
-    revalidatePath('/profile');
+    revalidate();
 
     return { success: true, message: 'Gasto excluído com sucesso!' };
-  } catch (error: any) {
-    return { success: false, message: error.message || 'Erro ao excluir gasto.' };
+  } catch (error) {
+    return { success: false, message: errorMessage(error, 'Erro ao excluir gasto.') };
   }
 }

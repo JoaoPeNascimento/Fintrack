@@ -1,81 +1,48 @@
 'use server';
 
-import dbConnect from '@/lib/mongoose';
-import Card from '@/models/Card';
 import { revalidatePath } from 'next/cache';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { backendFetch, errorMessage } from '@/lib/backend';
+import type { CardColor } from '@/components/CardManager';
 
-export async function createCard(formData: {
+type CardInput = {
   name: string;
   limit: number;
   closingDay: number;
   dueDay: number;
   color: string;
-}) {
+};
+
+type BackendCard = Omit<CardInput, 'color'> & { id: string; color: CardColor };
+
+function toCardData(card: BackendCard) {
+  return {
+    _id: card.id,
+    name: card.name,
+    limit: card.limit,
+    closingDay: card.closingDay,
+    dueDay: card.dueDay,
+    color: card.color,
+  };
+}
+
+export async function createCard(formData: CardInput) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session || !session.user?.email) {
-      throw new Error("Você precisa estar logado para criar um cartão.");
-    }
-    
-    const userId = (session.user as any).id;
+    const card = await backendFetch<BackendCard>('/cards', { method: 'POST', body: formData });
 
-    if (!userId) {
-       throw new Error("ID de usuário não encontrado!");
-    }
-
-    await dbConnect();
-
-    const newCard = new Card({
-      name: formData.name,
-      limit: formData.limit,
-      closingDay: formData.closingDay,
-      dueDay: formData.dueDay,
-      color: formData.color,
-      userId,
-    });
-
-    await newCard.save();
-    
     revalidatePath('/profile');
-    
-    // Retornamos os dados em formato raw/plain (serializáveis)
-    const cardData = {
-       _id: newCard._id?.toString(),
-       name: newCard.name,
-       limit: newCard.limit,
-       closingDay: newCard.closingDay,
-       dueDay: newCard.dueDay,
-       color: newCard.color,
-    };
-    
-    return { success: true, message: 'Cartão registrado com sucesso!', card: cardData };
-  } catch (error: any) {
-    return { success: false, message: error.message || 'Falha ao salvar o cartão no banco de dados.' };
+
+    return { success: true, message: 'Cartão registrado com sucesso!', card: toCardData(card) };
+  } catch (error) {
+    return { success: false, message: errorMessage(error, 'Falha ao salvar o cartão no banco de dados.') };
   }
 }
 
 export async function getUserCards() {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session || !session.user?.email) {
-      return { success: false, data: [] };
-    }
-    
-    const userId = (session.user as any).id;
-    if (!userId) {
-      return { success: false, data: [] };
-    }
+    const cards = await backendFetch<BackendCard[]>('/cards');
 
-    await dbConnect();
-
-    const allCards = await Card.find({ userId }).sort({ createdAt: -1 }).lean();
-
-    const plainCards = allCards.map((c: any) => ({
-      id: c._id?.toString(),
+    const plainCards = cards.map((c) => ({
+      id: c.id,
       name: c.name,
       limit: c.limit,
       closingDay: c.closingDay,
@@ -84,82 +51,33 @@ export async function getUserCards() {
     }));
 
     return { success: true, data: plainCards };
-  } catch (error: any) {
+  } catch {
     return { success: false, data: [] };
   }
 }
 
-export async function updateCard(
-  cardId: string,
-  formData: {
-    name: string;
-    limit: number;
-    closingDay: number;
-    dueDay: number;
-    color: string;
-  }
-) {
+export async function updateCard(cardId: string, formData: CardInput) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user?.email) throw new Error("Acesso negado.");
-    
-    const userId = (session.user as any).id;
-    if (!userId) throw new Error("Acesso negado.");
-
-    await dbConnect();
-
-    const updatedCard = await Card.findOneAndUpdate(
-      { _id: cardId, userId },
-      {
-        name: formData.name,
-        limit: formData.limit,
-        closingDay: formData.closingDay,
-        dueDay: formData.dueDay,
-        color: formData.color,
-      },
-      { new: true }
-    );
-
-    if (!updatedCard) {
-      throw new Error("Cartão não encontrado ou sem permissão para editar.");
-    }
+    const card = await backendFetch<BackendCard>(`/cards/${encodeURIComponent(cardId)}`, {
+      method: 'PUT',
+      body: formData,
+    });
 
     revalidatePath('/profile');
 
-    const cardData = {
-       _id: updatedCard._id?.toString(),
-       name: updatedCard.name,
-       limit: updatedCard.limit,
-       closingDay: updatedCard.closingDay,
-       dueDay: updatedCard.dueDay,
-       color: updatedCard.color,
-    };
-
-    return { success: true, message: 'Cartão atualizado com sucesso!', card: cardData };
-  } catch (error: any) {
-    return { success: false, message: error.message || 'Falha ao atualizar cartão.' };
+    return { success: true, message: 'Cartão atualizado com sucesso!', card: toCardData(card) };
+  } catch (error) {
+    return { success: false, message: errorMessage(error, 'Falha ao atualizar cartão.') };
   }
 }
 
 export async function deleteCard(cardId: string) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user?.email) throw new Error("Acesso negado.");
-    
-    const userId = (session.user as any).id;
-    if (!userId) throw new Error("Acesso negado.");
-
-    await dbConnect();
-
-    const deletedCard = await Card.findOneAndDelete({ _id: cardId, userId });
-
-    if (!deletedCard) {
-      throw new Error("Cartão não encontrado ou sem permissão para deletar.");
-    }
+    await backendFetch(`/cards/${encodeURIComponent(cardId)}`, { method: 'DELETE' });
 
     revalidatePath('/profile');
     return { success: true, message: 'Cartão deletado com sucesso!' };
-  } catch (error: any) {
-    return { success: false, message: error.message || 'Falha ao deletar cartão.' };
+  } catch (error) {
+    return { success: false, message: errorMessage(error, 'Falha ao deletar cartão.') };
   }
 }

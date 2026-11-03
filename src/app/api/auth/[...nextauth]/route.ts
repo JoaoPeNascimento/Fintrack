@@ -1,7 +1,6 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-import dbConnect from '@/lib/mongoose';
-import User from '@/models/User';
+import { callBackend } from '@/lib/backend';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -11,45 +10,22 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    // Synchronize the OAuth successful login with our MongoDB User collection
-    async signIn({ user, account, profile }) {
+    // Register the user in the backend on the first Google login
+    async signIn({ user, account }) {
       if (account?.provider === 'google') {
+        if (!user.email) return false;
         try {
-          await dbConnect();
-          
-          let existingUser = await User.findOne({ email: user.email });
-
-          if (!existingUser) {
-            existingUser = await User.create({
-              email: user.email,
-              name: user.name,
-              image: user.image,
-              provider: 'google',
-            });
-          }
-
+          await callBackend(
+            { email: user.email, name: user.name, image: user.image },
+            '/me'
+          );
           return true; // OK to login
         } catch (error) {
-          console.error("Error saving user during sign in", error);
+          console.error("Error syncing user with backend during sign in", error);
           return false; // Prevent login on error
         }
       }
       return true;
-    },
-    // Attach the MongoDB user _id to the session payload
-    async session({ session }) {
-      if (session.user?.email) {
-        try {
-          await dbConnect();
-          const dbUser = await User.findOne({ email: session.user.email });
-          if (dbUser) {
-            session.user.id = dbUser._id.toString();
-          }
-        } catch (error) {
-          console.error("Error retrieving user session data", error);
-        }
-      }
-      return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
