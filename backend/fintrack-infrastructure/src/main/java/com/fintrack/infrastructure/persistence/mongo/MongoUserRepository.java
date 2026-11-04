@@ -2,7 +2,11 @@ package com.fintrack.infrastructure.persistence.mongo;
 
 import com.fintrack.domain.user.User;
 import com.fintrack.domain.user.UserRepository;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import java.time.Clock;
@@ -36,6 +40,35 @@ public class MongoUserRepository implements UserRepository {
         UserDocument saved = mongo.save(new UserDocument(id, user.email(), user.name(), user.image(),
                 user.provider(), now, now));
         return toDomain(saved);
+    }
+
+    /**
+     * Upsert atômico ({@code findAndModify} + {@code $setOnInsert}). Depende do índice único em
+     * {@code email} (ver {@link MongoConfig}): se duas inserções concorrentes colidirem, a perdedora
+     * recebe {@link DuplicateKeyException} e passa a ler o documento já criado.
+     */
+    @Override
+    public User findOrRegister(User candidate) {
+        Query byEmail = query(where("email").is(candidate.email()));
+        Instant now = clock.instant();
+        Update insertOnly = new Update()
+                .setOnInsert("name", candidate.name())
+                .setOnInsert("image", candidate.image())
+                .setOnInsert("provider", candidate.provider())
+                .setOnInsert("createdAt", now)
+                .setOnInsert("updatedAt", now);
+
+        UserDocument doc;
+        try {
+            doc = mongo.findAndModify(byEmail, insertOnly,
+                    FindAndModifyOptions.options().upsert(true).returnNew(true), UserDocument.class);
+        } catch (DuplicateKeyException e) {
+            doc = mongo.findOne(byEmail, UserDocument.class);
+        }
+        if (doc == null) {
+            throw new IllegalStateException("Falha ao sincronizar o usuário " + candidate.email());
+        }
+        return toDomain(doc);
     }
 
     private static User toDomain(UserDocument doc) {

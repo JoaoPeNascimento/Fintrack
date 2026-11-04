@@ -73,3 +73,10 @@ cd frontend && npm run build  # front-end
 
 ## Deploy
 `.github/workflows/deploy.yml` roda os testes e, em seguida, atualiza a EC2: build do jar e restart do serviço systemd (`backend/deploy/fintrack-backend.service`), depois build do Next e restart do pm2.
+
+### Migração de dados (primeiro deploy do backend)
+O antigo cron da Vercel decrementava `installments` todo mês; o backend trata o campo como total imutável. Antes do primeiro deploy na `main`:
+
+1. **Desligue o cron** `/api/cron/update-installments` na Vercel e anote a data da última execução (`CRON_LAST_RUN`, dia 1º).
+2. `mongosh "$MONGODB_URI" --file backend/deploy/migrations/check-duplicate-users.js`: o backend não sobe sem o índice único em `users.email`, então resolva os duplicados antes.
+3. `CRON_LAST_RUN=yyyy-MM-01 mongosh "$MONGODB_URI" --file backend/deploy/migrations/2026-11-restore-installments.js` (dry-run), revise os itens `[revisar]` e rode de novo com `APPLY=1`. Confirme `CRON_FIRST_RUN` (padrão `2026-04-01`) nos logs de cron da Vercel.

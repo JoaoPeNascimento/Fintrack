@@ -40,10 +40,23 @@ public class MongoConfig {
 
     @EventListener(ApplicationReadyEvent.class)
     void createIndexes() {
-        ensureIndex(UserDocument.COLLECTION, new Index().on("email", Sort.Direction.ASC).unique());
+        ensureRequiredIndex(UserDocument.COLLECTION, new Index().on("email", Sort.Direction.ASC).unique());
         ensureIndex(CardDocument.COLLECTION, new Index().on("userId", Sort.Direction.ASC).on("createdAt", Sort.Direction.DESC));
         ensureIndex(FixedExpenseDocument.COLLECTION, new Index().on("userId", Sort.Direction.ASC).on("createdAt", Sort.Direction.DESC));
         ensureIndex(ExpenseDocument.COLLECTION, new Index().on("userId", Sort.Direction.ASC).on("date", Sort.Direction.DESC));
+    }
+
+    /**
+     * Índices de que a corretude depende (ex.: e-mail único garante um usuário por conta no upsert).
+     * Se não puderem ser criados — por exemplo, há e-mails duplicados — a aplicação não sobe.
+     */
+    private void ensureRequiredIndex(String collection, IndexDefinition index) {
+        try {
+            mongoTemplate.indexOps(collection).ensureIndex(index);
+        } catch (RuntimeException e) {
+            throw new IllegalStateException("Índice obrigatório não pôde ser criado em " + collection
+                    + ". Verifique documentos duplicados (backend/deploy/migrations/check-duplicate-users.js).", e);
+        }
     }
 
     private void ensureIndex(String collection, IndexDefinition index) {

@@ -4,8 +4,11 @@ import com.fintrack.domain.expense.Expense;
 import com.fintrack.domain.expense.ExpenseRepository;
 import com.fintrack.domain.expense.MonthlyTotal;
 import com.fintrack.domain.expense.PaymentMethod;
+import com.fintrack.domain.shared.ValidationException;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -36,6 +39,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 @Repository
 public class MongoExpenseRepository implements ExpenseRepository {
 
+    private static final Logger log = LoggerFactory.getLogger(MongoExpenseRepository.class);
     private static final Sort BY_DATE_DESC = Sort.by(Sort.Direction.DESC, "date");
 
     private final MongoTemplate mongo;
@@ -101,7 +105,10 @@ public class MongoExpenseRepository implements ExpenseRepository {
     }
 
     private List<Expense> find(Query query) {
-        return mongo.find(query, ExpenseDocument.class).stream().map(MongoExpenseRepository::toDomain).toList();
+        return mongo.find(query, ExpenseDocument.class).stream()
+                .map(MongoExpenseRepository::toDomainSafely)
+                .flatMap(Optional::stream)
+                .toList();
     }
 
     private static Criteria ownedBy(String userId) {
@@ -131,8 +138,35 @@ public class MongoExpenseRepository implements ExpenseRepository {
         return Expense.restore(doc.id(), doc.userId(), doc.name(), doc.description(),
                 doc.value() == null ? BigDecimal.ZERO : BigDecimal.valueOf(doc.value()),
                 doc.date() == null ? null : LocalDate.ofInstant(doc.date(), ZoneOffset.UTC),
-                PaymentMethod.from(doc.paymentMethod()),
-                doc.installments() == null ? 1 : doc.installments(),
+                paymentMethodOf(doc),
+                doc.installments() == null || doc.installments() < 1 ? 1 : doc.installments(),
                 doc.cardId(), doc.createdAt());
+    }
+
+    /**
+     * Documentos legados podem ter forma de pagamento ausente ou fora do enum (o {@code updateOne} do
+     * Mongoose não rodava validators). Em vez de falhar a leitura, assume CARTAO se houver cartão
+     * vinculado e DINHEIRO caso contrário, e registra o documento para correção manual.
+     */
+    static PaymentMethod paymentMethodOf(ExpenseDocument doc) {
+        try {
+            return PaymentMethod.from(doc.paymentMethod());
+        } catch (ValidationException e) {
+            PaymentMethod fallback = doc.cardId() != null && !doc.cardId().isBlank()
+                    ? PaymentMethod.CARTAO : PaymentMethod.DINHEIRO;
+            log.warn("Gasto {} com forma de pagamento inválida ({}); lido como {}.",
+                    doc.id(), doc.paymentMethod(), fallback);
+            return fallback;
+        }
+    }
+
+    /** Um documento malformado não pode derrubar a listagem inteira: ele é ignorado e logado. */
+    private static Optional<Expense> toDomainSafely(ExpenseDocument doc) {
+        try {
+            return Optional.of(toDomain(doc));
+        } catch (RuntimeException e) {
+            log.error("Gasto {} ignorado: documento inválido ({}).", doc.id(), e.getMessage());
+            return Optional.empty();
+        }
     }
 }
