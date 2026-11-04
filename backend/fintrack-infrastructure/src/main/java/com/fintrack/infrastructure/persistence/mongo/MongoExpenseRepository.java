@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -102,6 +103,12 @@ public class MongoExpenseRepository implements ExpenseRepository {
     public boolean deleteByIdAndUser(String id, String userId) {
         return MongoIds.isValid(id)
                 && mongo.remove(query(byIdAndUser(id, userId)), ExpenseDocument.class).getDeletedCount() > 0;
+    }
+
+    @Override
+    public void unlinkCard(String userId, String cardId) {
+        mongo.updateMulti(query(ownedBy(userId).and("cardId").is(cardId)),
+                new Update().unset("cardId").set("updatedAt", clock.instant()), ExpenseDocument.class);
     }
 
     private List<Expense> find(Query query) {

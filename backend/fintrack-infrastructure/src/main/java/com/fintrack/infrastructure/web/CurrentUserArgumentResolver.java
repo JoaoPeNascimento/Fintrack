@@ -2,6 +2,9 @@ package com.fintrack.infrastructure.web;
 
 import com.fintrack.application.user.SyncAuthenticatedUser;
 import com.fintrack.domain.user.User;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
@@ -13,18 +16,33 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.time.Duration;
 
 @Component
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final SyncAuthenticatedUser syncAuthenticatedUser;
-    /** e-mail -> id do usuário; evita uma consulta ao banco por requisição. */
-    private final Map<String, String> userIds = new ConcurrentHashMap<>();
+    static final int MAX_CACHED_USERS = 10_000;
+    static final Duration CACHE_TTL = Duration.ofMinutes(10);
 
+    private final SyncAuthenticatedUser syncAuthenticatedUser;
+
+    /**
+     * e-mail -> id do usuário; evita uma consulta ao banco por requisição. Limitado e com expiração,
+     * para que um usuário removido/recriado volte a ser resolvido no banco em no máximo {@link #CACHE_TTL}.
+     */
+    private final Cache<String, String> userIds;
+
+    @Autowired
     public CurrentUserArgumentResolver(SyncAuthenticatedUser syncAuthenticatedUser) {
+        this(syncAuthenticatedUser, Caffeine.newBuilder()
+                .maximumSize(MAX_CACHED_USERS)
+                .expireAfterWrite(CACHE_TTL)
+                .build());
+    }
+
+    CurrentUserArgumentResolver(SyncAuthenticatedUser syncAuthenticatedUser, Cache<String, String> userIds) {
         this.syncAuthenticatedUser = syncAuthenticatedUser;
+        this.userIds = userIds;
     }
 
     @Override
@@ -39,7 +57,22 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         if (authentication == null || !(authentication.getPrincipal() instanceof Jwt jwt)) {
             throw new AuthenticationCredentialsNotFoundException("Usuário não autenticado.");
         }
-        return userIds.computeIfAbsent(jwt.getSubject(), email -> sync(jwt).id());
+        return resolveUserId(jwt);
+    }
+
+    /**
+     * A consulta ao banco roda fora de qualquer lock do cache: requisições concorrentes do mesmo
+     * e-mail podem sincronizar em paralelo, o que é seguro porque o cadastro é um upsert atômico.
+     */
+    String resolveUserId(Jwt jwt) {
+        String email = jwt.getSubject();
+        String cached = userIds.getIfPresent(email);
+        if (cached != null) {
+            return cached;
+        }
+        String id = sync(jwt).id();
+        userIds.put(email, id);
+        return id;
     }
 
     User sync(Jwt jwt) {

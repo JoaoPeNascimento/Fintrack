@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { backendFetch, errorMessage, toLegacyIsoDate } from '@/lib/backend';
+import { backendFetch, errorMessage } from '@/lib/backend';
 
 type BackendExpense = {
   id: string;
@@ -28,7 +28,7 @@ function toPlainGasto(g: BackendExpense) {
     _id: g.id,
     name: g.name,
     value: g.value,
-    date: toLegacyIsoDate(g.date),
+    date: g.date, // dia do calendário "yyyy-MM-dd"; formate com '@/lib/date'
     payment_method: g.paymentMethod,
     installments: g.installments,
     description: g.description ?? undefined,

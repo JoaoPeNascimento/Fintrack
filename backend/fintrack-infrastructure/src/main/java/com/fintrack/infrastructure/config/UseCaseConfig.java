@@ -55,8 +55,8 @@ public class UseCaseConfig {
     }
 
     @Bean
-    DeleteCard deleteCard(CardRepository cards) {
-        return new DeleteCard(cards);
+    DeleteCard deleteCard(CardRepository cards, ExpenseRepository expenses) {
+        return new DeleteCard(cards, expenses);
     }
 
     @Bean

@@ -24,8 +24,9 @@ public class UpdateExpense {
     public Expense execute(String userId, String expenseId, ExpenseDetails details) {
         Expense expense = expenses.findByIdAndUser(expenseId, userId)
                 .orElseThrow(() -> new NotFoundException("Gasto não encontrado ou não autorizado."));
+        String previousCardId = expense.cardId();
         expense.update(details, LocalDate.now(clock));
-        CardOwnershipCheck.verify(cards, expense);
+        CardOwnershipCheck.verifyChange(cards, previousCardId, expense);
         return expenses.save(expense);
     }
 }

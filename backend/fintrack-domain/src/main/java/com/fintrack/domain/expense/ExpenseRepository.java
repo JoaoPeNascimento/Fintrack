@@ -20,4 +20,7 @@ public interface ExpenseRepository {
     List<MonthlyTotal> sumByMonth(String userId);
 
     boolean deleteByIdAndUser(String id, String userId);
+
+    /** Remove o vínculo dos gastos do usuário com o cartão (a forma de pagamento continua CARTAO). */
+    void unlinkCard(String userId, String cardId);
 }

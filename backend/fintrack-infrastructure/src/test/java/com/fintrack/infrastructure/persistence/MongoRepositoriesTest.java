@@ -183,4 +183,22 @@ class MongoRepositoriesTest {
             pool.shutdownNow();
         }
     }
+
+    @Test
+    void unlinkCardOnlyTouchesExpensesOfThatUserAndCard() {
+        String cardId = new ObjectId().toHexString();
+        Expense mine = expenses.save(Expense.create(USER.toHexString(), new ExpenseDetails("TV", null,
+                new BigDecimal("300"), LocalDate.of(2026, 3, 5), PaymentMethod.CARTAO, 3, cardId), LocalDate.now()));
+        String otherUser = new ObjectId().toHexString();
+        Expense theirs = expenses.save(Expense.create(otherUser, new ExpenseDetails("TV", null,
+                new BigDecimal("300"), LocalDate.of(2026, 3, 5), PaymentMethod.CARTAO, 3, cardId), LocalDate.now()));
+
+        expenses.unlinkCard(USER.toHexString(), cardId);
+
+        Expense unlinked = expenses.findByIdAndUser(mine.id(), USER.toHexString()).orElseThrow();
+        assertThat(unlinked.cardId()).isNull();
+        assertThat(unlinked.paymentMethod()).isEqualTo(PaymentMethod.CARTAO);
+        assertThat(unlinked.installments()).isEqualTo(3);
+        assertThat(expenses.findByIdAndUser(theirs.id(), otherUser).orElseThrow().cardId()).isEqualTo(cardId);
+    }
 }

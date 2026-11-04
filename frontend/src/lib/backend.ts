@@ -81,8 +81,3 @@ export async function backendFetch<T>(path: string, init: { method?: string; bod
 export function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
 }
-
-/** Backend dates are calendar days ("2026-03-15"); the UI expects the ISO format Mongoose used to return. */
-export function toLegacyIsoDate(date: string | null) {
-  return date ? `${date}T00:00:00.000Z` : null;
-}

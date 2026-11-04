@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class CardUseCasesTest {
 
     private final InMemoryRepositories.Cards cards = new InMemoryRepositories.Cards();
+    private final InMemoryRepositories.Expenses expenses = new InMemoryRepositories.Expenses();
 
     @Test
     void createUpdateAndDelete() {
@@ -25,7 +26,7 @@ class CardUseCasesTest {
         assertThat(updated.name()).isEqualTo("Nubank Ultravioleta");
         assertThat(new ListCards(cards).execute("user-1")).hasSize(1);
 
-        new DeleteCard(cards).execute("user-1", card.id());
+        new DeleteCard(cards, expenses).execute("user-1", card.id());
         assertThat(new ListCards(cards).execute("user-1")).isEmpty();
     }
 
@@ -37,7 +38,7 @@ class CardUseCasesTest {
                 new CardDetails("X", BigDecimal.ONE, 1, 1, "red")))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Cartão não encontrado ou sem permissão para editar.");
-        assertThatThrownBy(() -> new DeleteCard(cards).execute("user-2", card.id()))
+        assertThatThrownBy(() -> new DeleteCard(cards, expenses).execute("user-2", card.id()))
                 .hasMessage("Cartão não encontrado ou sem permissão para deletar.");
     }
 }

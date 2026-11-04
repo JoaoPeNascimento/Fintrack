@@ -1,6 +1,7 @@
 package com.fintrack.application.expense;
 
 import com.fintrack.application.InMemoryRepositories;
+import com.fintrack.application.card.DeleteCard;
 import com.fintrack.domain.card.Card;
 import com.fintrack.domain.card.CardDetails;
 import com.fintrack.domain.expense.Expense;
@@ -94,6 +95,40 @@ class ExpenseUseCasesTest {
 
         delete.execute(USER, created.id());
         assertThat(expenses.findAllByUser(USER)).isEmpty();
+    }
+
+    @Test
+    void deletingCardUnlinksItsExpensesAndTheyStayEditable() {
+        Card card = cards.save(Card.create(USER, new CardDetails("Nubank", BigDecimal.TEN, 1, 10, "purple")));
+        Expense tv = createExpense.execute(USER, purchase("TV", "300", LocalDate.of(2026, 3, 1), PaymentMethod.CARTAO, 3, card.id()));
+
+        new DeleteCard(cards, expenses).execute(USER, card.id());
+
+        Expense unlinked = expenses.findByIdAndUser(tv.id(), USER).orElseThrow();
+        assertThat(unlinked.cardId()).isNull();
+        assertThat(unlinked.paymentMethod()).isEqualTo(PaymentMethod.CARTAO);
+        assertThat(unlinked.installments()).isEqualTo(3);
+
+        Expense renamed = new UpdateExpense(expenses, cards, clock).execute(USER, tv.id(),
+                purchase("TV Sala", "100", LocalDate.of(2026, 3, 1), PaymentMethod.CARTAO, 3, null));
+        assertThat(renamed.name()).isEqualTo("TV Sala");
+    }
+
+    @Test
+    void expenseStillPointingToRemovedCardCanBeEditedButNotMovedToForeignCard() {
+        // Dado legado: gasto que aponta para um cartão removido antes do desvínculo automático.
+        Expense orphan = expenses.save(Expense.restore(null, USER, "TV", null, new BigDecimal("100"),
+                LocalDate.of(2026, 3, 1), PaymentMethod.CARTAO, 3, "removed-card", null));
+        Card foreign = cards.save(Card.create(OTHER_USER, new CardDetails("Itaú", BigDecimal.TEN, 1, 10, "blue")));
+        UpdateExpense update = new UpdateExpense(expenses, cards, clock);
+
+        Expense renamed = update.execute(USER, orphan.id(),
+                purchase("TV Sala", "100", LocalDate.of(2026, 3, 1), PaymentMethod.CARTAO, 3, "removed-card"));
+        assertThat(renamed.name()).isEqualTo("TV Sala");
+
+        assertThatThrownBy(() -> update.execute(USER, orphan.id(),
+                purchase("TV Sala", "100", LocalDate.of(2026, 3, 1), PaymentMethod.CARTAO, 3, foreign.id())))
+                .isInstanceOf(ValidationException.class);
     }
 
     @Test

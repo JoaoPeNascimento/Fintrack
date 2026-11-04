@@ -105,5 +105,13 @@ public final class InMemoryRepositories {
         public boolean deleteByIdAndUser(String id, String userId) {
             return findByIdAndUser(id, userId).map(e -> store.remove(id) != null).orElse(false);
         }
+
+        @Override
+        public void unlinkCard(String userId, String cardId) {
+            store.replaceAll((id, e) -> e.userId().equals(userId) && cardId.equals(e.cardId())
+                    ? Expense.restore(id, e.userId(), e.name(), e.description(), e.value(), e.date(),
+                            e.paymentMethod(), e.installments(), null, e.createdAt())
+                    : e);
+        }
     }
 }

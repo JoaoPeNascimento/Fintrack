@@ -3,6 +3,7 @@
 import { useTransition, memo, useMemo } from 'react';
 import { deleteGasto } from '@/actions/gasto';
 import toast from 'react-hot-toast';
+import { formatCalendarDate } from '@/lib/date';
 
 type Gasto = {
   _id: string;
@@ -14,7 +15,6 @@ type Gasto = {
   description?: string;
 };
 
-const dateFormatter = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' });
 const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
 const ExpenseTable = ({ gastos, onEdit, onViewClick }: { gastos: Gasto[]; onEdit?: (gasto: Gasto) => void; onViewClick?: (gasto: Gasto) => void }) => {
@@ -74,7 +74,7 @@ const ExpenseTable = ({ gastos, onEdit, onViewClick }: { gastos: Gasto[]; onEdit
                 )}
               </td>
               <td className="num py-3 px-4 text-sm text-muted whitespace-nowrap">
-                {gasto.date ? dateFormatter.format(new Date(gasto.date)) : '--/--/----'}
+                {formatCalendarDate(gasto.date)}
               </td>
               <td className="py-3 px-4 text-sm">
                 <span className="badge">

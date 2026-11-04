@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { DespesaFixa } from './DespesaFixaManager';
+import { formatCalendarDate } from '@/lib/date';
 
 type Gasto = {
   _id: string;
@@ -17,7 +18,6 @@ type ViewExpenseDetailsProps = {
 };
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-const dateFormatter = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' });
 
 function isGastoType(gasto: Gasto | DespesaFixa): gasto is Gasto {
   return 'payment_method' in gasto;
@@ -61,7 +61,7 @@ export default function ViewExpenseDetails({ gasto, onClose }: ViewExpenseDetail
         <dl className="divide-y divide-line border-y border-line">
           {gasto.date && (
             <DetailRow label="Data">
-              <span className="num">{dateFormatter.format(new Date(gasto.date as string))}</span>
+              <span className="num">{formatCalendarDate(gasto.date)}</span>
             </DetailRow>
           )}
           <DetailRow label="Forma de pagamento">{formatPaymentMethod(gasto.payment_method)}</DetailRow>

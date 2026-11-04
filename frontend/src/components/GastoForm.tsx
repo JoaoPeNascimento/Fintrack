@@ -3,6 +3,7 @@
 import { createGasto } from '@/actions/gasto';
 import { useRef, useActionState, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { todayCalendarDate } from '@/lib/date';
 
 // Initial state for the action
 const initialState = {
@@ -43,7 +44,7 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
       if (valueInput) valueInput.value = gastoToEdit.value.toString();
 
       const dateInput = form.elements.namedItem('date') as HTMLInputElement;
-      if (dateInput) dateInput.value = gastoToEdit.date ? gastoToEdit.date.split('T')[0] : '';
+      if (dateInput) dateInput.value = gastoToEdit.date ? gastoToEdit.date.slice(0, 10) : '';
       
       setPaymentMethod(gastoToEdit.payment_method === 'CARTAO' && gastoToEdit.cardId ? `CARD_${gastoToEdit.cardId}` : gastoToEdit.payment_method);
       
@@ -54,6 +55,9 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
       if (descInput) descInput.value = gastoToEdit.description || '';
     } else if (formRef.current) {
       formRef.current.reset();
+      // Definido no cliente (e não via defaultValue) para usar o dia local do navegador sem divergir do SSR.
+      const dateInput = formRef.current.elements.namedItem('date') as HTMLInputElement;
+      if (dateInput) dateInput.value = todayCalendarDate();
       setPaymentMethod('PIX');
     }
   }, [gastoToEdit]);
@@ -76,7 +80,11 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
     }
   }, [state, onSuccess]);
 
-  const isCard = paymentMethod.startsWith('CARD_');
+  // CARTAO puro = gasto no cartão cujo cartão foi removido; continua parcelável.
+  const isCard = paymentMethod.startsWith('CARD_') || paymentMethod === 'CARTAO';
+  // Sem uma <option> correspondente o <select> ficaria vazio e o formulário enviaria outra forma de pagamento.
+  const hasMatchingCard = cards.some((card) => `CARD_${card.id}` === paymentMethod);
+  const showRemovedCard = isCard && !hasMatchingCard;
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-5">
@@ -125,7 +133,6 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
             type="date"
             name="date"
             id="date"
-            defaultValue={new Date().toISOString().split('T')[0]}
             required
             className="input"
           />
@@ -145,7 +152,8 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
             <option value="PIX">Pix</option>
             <option value="DINHEIRO">Dinheiro</option>
             <optgroup label="Cartões de Crédito">
-              {cards.length === 0 && <option disabled>Nenhum cartão cadastrado</option>}
+              {showRemovedCard && <option value={paymentMethod}>Cartão removido</option>}
+              {cards.length === 0 && !showRemovedCard && <option disabled>Nenhum cartão cadastrado</option>}
               {cards.map(card => (
                 <option key={card.id} value={`CARD_${card.id}`}>{card.name} (Cartão)</option>
               ))}
