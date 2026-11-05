@@ -1,6 +1,5 @@
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getCurrentSession } from '@/lib/backend';
 import { getMonthlyExpenseSummary } from '@/actions/gasto';
 import { getUserCards } from '@/actions/card';
 import ProfileMonthlyHistory from '@/components/ProfileMonthlyHistory';
@@ -10,19 +9,20 @@ import { getUserDespesasFixas } from '@/actions/despesaFixa';
 import DespesaFixaManager from '@/components/DespesaFixaManager';
 
 export default async function ProfilePage() {
-  const session = await getServerSession(authOptions);
+  const session = await getCurrentSession();
 
   if (!session) {
     redirect('/');
   }
 
-  const historyData = await getMonthlyExpenseSummary();
+  // Chamadas independentes ao backend: em paralelo, não em sequência.
+  const [historyData, cardsData, despesasFixasData] = await Promise.all([
+    getMonthlyExpenseSummary(),
+    getUserCards(),
+    getUserDespesasFixas(),
+  ]);
   const history = historyData.success ? historyData.data : [];
-
-  const cardsData = await getUserCards();
   const userCards = cardsData.success ? cardsData.data : [];
-
-  const despesasFixasData = await getUserDespesasFixas();
   const despesasFixas = despesasFixasData.success ? despesasFixasData.data : [];
 
   return (

@@ -1,26 +1,26 @@
 import DashboardClient from '@/components/DashboardClient';
 import AppHeader from '@/components/AppHeader';
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getCurrentSession } from '@/lib/backend';
 import { getUserGastos } from '@/actions/gasto';
 import { getUserCards } from '@/actions/card';
 import { getUserDespesasFixas } from '@/actions/despesaFixa';
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getCurrentSession();
 
   if (!session) {
     redirect('/');
   }
 
-  const gastosData = await getUserGastos();
+  // Chamadas independentes ao backend: em paralelo, não em sequência.
+  const [gastosData, cardsData, despesasFixasData] = await Promise.all([
+    getUserGastos(),
+    getUserCards(),
+    getUserDespesasFixas(),
+  ]);
   const gastos = gastosData.success ? gastosData.data : [];
-
-  const cardsData = await getUserCards();
   const cards = cardsData.success ? cardsData.data : [];
-
-  const despesasFixasData = await getUserDespesasFixas();
   const despesasFixas = despesasFixasData.success ? despesasFixasData.data : [];
 
   // Sem isso, uma falha no backend aparece como um dashboard vazio, indistinguível de "sem gastos".
