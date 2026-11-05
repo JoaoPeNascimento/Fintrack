@@ -1,0 +1,17 @@
+# systemd unit para a EC2. Instalação:
+#   sudo cp deploy/fintrack-backend.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now fintrack-backend
+# Variáveis (MONGODB_URI, BACKEND_JWT_SECRET, APP_TIMEZONE) ficam em /etc/fintrack/backend.env (chmod 600).
+[Unit]
+Description=Fintrack backend (Spring Boot)
+After=network.target
+
+[Service]
+User=ubuntu
+EnvironmentFile=/etc/fintrack/backend.env
+ExecStart=/usr/bin/java -jar /home/ubuntu/app/backend/fintrack-infrastructure/target/fintrack-backend.jar --server.address=127.0.0.1
+Restart=on-failure
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
