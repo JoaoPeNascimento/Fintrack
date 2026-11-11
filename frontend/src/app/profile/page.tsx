@@ -7,6 +7,9 @@ import AppHeader from '@/components/AppHeader';
 import CardManager from '@/components/CardManager';
 import { getUserDespesasFixas } from '@/actions/despesaFixa';
 import DespesaFixaManager from '@/components/DespesaFixaManager';
+import { getMyShare, getSharedWithMe } from '@/actions/share';
+import ShareSettings from '@/components/ShareSettings';
+import SharedWithMeList from '@/components/SharedWithMeList';
 
 export default async function ProfilePage() {
   const session = await getCurrentSession();
@@ -16,10 +19,12 @@ export default async function ProfilePage() {
   }
 
   // Chamadas independentes ao backend: em paralelo, não em sequência.
-  const [historyData, cardsData, despesasFixasData] = await Promise.all([
+  const [historyData, cardsData, despesasFixasData, myShareData, sharedWithMeData] = await Promise.all([
     getMonthlyExpenseSummary(),
     getUserCards(),
     getUserDespesasFixas(),
+    getMyShare(),
+    getSharedWithMe(),
   ]);
   const history = historyData.success ? historyData.data : [];
   const userCards = cardsData.success ? cardsData.data : [];
@@ -61,6 +66,10 @@ export default async function ProfilePage() {
             </span>
           </div>
         </section>
+
+        {/* Sharing: what others shared with me, and my own share settings */}
+        <SharedWithMeList initialSpaces={sharedWithMeData.data} />
+        <ShareSettings initialShare={myShareData.data} />
 
         {/* Card Management Section */}
         <CardManager initialCards={userCards} />

@@ -6,8 +6,12 @@ import com.fintrack.domain.expense.Expense;
 import com.fintrack.domain.expense.ExpenseDetails;
 import com.fintrack.domain.expense.MonthlyTotal;
 import com.fintrack.domain.expense.PaymentMethod;
+import com.fintrack.domain.share.ExpenseShare;
+import com.fintrack.domain.share.ShareMember;
+import com.fintrack.domain.share.SharePermission;
 import com.fintrack.domain.user.User;
 import com.fintrack.infrastructure.persistence.mongo.MongoCardRepository;
+import com.fintrack.infrastructure.persistence.mongo.MongoExpenseShareRepository;
 import com.fintrack.infrastructure.persistence.mongo.MongoExpenseRepository;
 import com.fintrack.infrastructure.persistence.mongo.MongoUserRepository;
 import org.bson.Document;
@@ -55,9 +59,12 @@ class MongoRepositoriesTest {
     MongoCardRepository cards;
     @Autowired
     MongoUserRepository users;
+    @Autowired
+    MongoExpenseShareRepository shares;
 
     @BeforeEach
     void clean() {
+        template.getCollection("expense_shares").deleteMany(new Document());
         template.getCollection("gastos").drop();
         template.getCollection("cards").drop();
         template.getCollection("users").deleteMany(new Document());
@@ -200,5 +207,42 @@ class MongoRepositoriesTest {
         assertThat(unlinked.paymentMethod()).isEqualTo(PaymentMethod.CARTAO);
         assertThat(unlinked.installments()).isEqualTo(3);
         assertThat(expenses.findByIdAndUser(theirs.id(), otherUser).orElseThrow().cardId()).isEqualTo(cardId);
+    }
+
+    @Test
+    void shareSaveIsUpsertByOwnerAndNeverOverwritesMembers() {
+        String owner = new ObjectId().toHexString();
+        String guest = new ObjectId().toHexString();
+        Instant joined = Instant.parse("2026-11-01T10:00:00Z");
+
+        ExpenseShare created = shares.save(ExpenseShare.create(owner, SharePermission.VIEW_ONLY, "tok-1"));
+        shares.addMember(owner, new ShareMember(guest, joined));
+        shares.addMember(owner, new ShareMember(guest, Instant.now()));
+
+        // Uma instância carregada antes do aceite não apaga o convidado ao ser salva.
+        created.configure(SharePermission.EDIT_ALL, true);
+        created.regenerateToken("tok-2");
+        shares.save(created);
+
+        ExpenseShare stored = shares.findByOwner(owner).orElseThrow();
+        assertThat(stored.permission()).isEqualTo(SharePermission.EDIT_ALL);
+        assertThat(stored.members()).extracting(ShareMember::userId, ShareMember::joinedAt)
+                .containsExactly(tuple(guest, joined));
+        assertThat(shares.findByToken("tok-1")).isEmpty();
+        assertThat(shares.findByToken("tok-2")).isPresent();
+        assertThat(shares.findAllByMember(guest)).extracting(ExpenseShare::ownerId).containsExactly(owner);
+
+        assertThat(shares.removeMember(owner, guest)).isTrue();
+        assertThat(shares.removeMember(owner, guest)).isFalse();
+        assertThat(shares.findAllByMember(guest)).isEmpty();
+    }
+
+    @Test
+    void findsUsersByIds() {
+        User a = users.findOrRegister(User.register("a@example.com", "A", null));
+        User b = users.findOrRegister(User.register("b@example.com", "B", null));
+
+        assertThat(users.findAllByIds(List.of(a.id(), b.id(), "invalid", new ObjectId().toHexString())))
+                .extracting(User::email).containsExactlyInAnyOrder("a@example.com", "b@example.com");
     }
 }

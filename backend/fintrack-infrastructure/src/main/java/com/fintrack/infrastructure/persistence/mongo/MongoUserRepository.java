@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -31,6 +33,17 @@ public class MongoUserRepository implements UserRepository {
     public Optional<User> findByEmail(String email) {
         return Optional.ofNullable(mongo.findOne(query(where("email").is(email)), UserDocument.class))
                 .map(MongoUserRepository::toDomain);
+    }
+
+    @Override
+    public List<User> findAllByIds(Collection<String> ids) {
+        List<String> valid = ids.stream().filter(MongoIds::isValid).distinct().toList();
+        if (valid.isEmpty()) {
+            return List.of();
+        }
+        return mongo.find(query(where("_id").in(valid)), UserDocument.class).stream()
+                .map(MongoUserRepository::toDomain)
+                .toList();
     }
 
     @Override

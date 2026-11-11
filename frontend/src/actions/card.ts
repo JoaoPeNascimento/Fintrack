@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { backendFetch, errorMessage } from '@/lib/backend';
+import { backendFetch, errorMessage, scopePath } from '@/lib/backend';
 import type { CardColor } from '@/components/CardManager';
 
 type CardInput = {
@@ -25,11 +25,17 @@ function toCardData(card: BackendCard) {
   };
 }
 
-export async function createCard(formData: CardInput) {
-  try {
-    const card = await backendFetch<BackendCard>('/cards', { method: 'POST', body: formData });
+function revalidateCards() {
+  revalidatePath('/profile');
+  revalidatePath('/dashboard');
+  revalidatePath('/shared/[ownerId]', 'page');
+}
 
-    revalidatePath('/profile');
+export async function createCard(formData: CardInput, ownerId?: string) {
+  try {
+    const card = await backendFetch<BackendCard>(`${scopePath(ownerId)}/cards`, { method: 'POST', body: formData });
+
+    revalidateCards();
 
     return { success: true, message: 'Cartão registrado com sucesso!', card: toCardData(card) };
   } catch (error) {
@@ -37,9 +43,9 @@ export async function createCard(formData: CardInput) {
   }
 }
 
-export async function getUserCards() {
+export async function getUserCards(ownerId?: string) {
   try {
-    const cards = await backendFetch<BackendCard[]>('/cards');
+    const cards = await backendFetch<BackendCard[]>(`${scopePath(ownerId)}/cards`);
 
     const plainCards = cards.map((c) => ({
       id: c.id,
@@ -56,14 +62,14 @@ export async function getUserCards() {
   }
 }
 
-export async function updateCard(cardId: string, formData: CardInput) {
+export async function updateCard(cardId: string, formData: CardInput, ownerId?: string) {
   try {
-    const card = await backendFetch<BackendCard>(`/cards/${encodeURIComponent(cardId)}`, {
+    const card = await backendFetch<BackendCard>(`${scopePath(ownerId)}/cards/${encodeURIComponent(cardId)}`, {
       method: 'PUT',
       body: formData,
     });
 
-    revalidatePath('/profile');
+    revalidateCards();
 
     return { success: true, message: 'Cartão atualizado com sucesso!', card: toCardData(card) };
   } catch (error) {
@@ -71,11 +77,11 @@ export async function updateCard(cardId: string, formData: CardInput) {
   }
 }
 
-export async function deleteCard(cardId: string) {
+export async function deleteCard(cardId: string, ownerId?: string) {
   try {
-    await backendFetch(`/cards/${encodeURIComponent(cardId)}`, { method: 'DELETE' });
+    await backendFetch(`${scopePath(ownerId)}/cards/${encodeURIComponent(cardId)}`, { method: 'DELETE' });
 
-    revalidatePath('/profile');
+    revalidateCards();
     return { success: true, message: 'Cartão deletado com sucesso!' };
   } catch (error) {
     return { success: false, message: errorMessage(error, 'Falha ao deletar cartão.') };

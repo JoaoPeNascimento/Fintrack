@@ -17,7 +17,7 @@ type Gasto = {
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-const ExpenseTable = ({ gastos, onEdit, onViewClick }: { gastos: Gasto[]; onEdit?: (gasto: Gasto) => void; onViewClick?: (gasto: Gasto) => void }) => {
+const ExpenseTable = ({ gastos, onEdit, onViewClick, canDelete = true, ownerId }: { gastos: Gasto[]; onEdit?: (gasto: Gasto) => void; onViewClick?: (gasto: Gasto) => void; canDelete?: boolean; ownerId?: string }) => {
   const [isPending, startTransition] = useTransition();
   const total = useMemo(() => gastos ? gastos.reduce((acc, gasto) => acc + gasto.value, 0) : 0, [gastos]);
 
@@ -25,7 +25,7 @@ const ExpenseTable = ({ gastos, onEdit, onViewClick }: { gastos: Gasto[]; onEdit
     if (!window.confirm('Tem certeza que deseja excluir esta despesa?')) return;
 
     startTransition(async () => {
-      const res = await deleteGasto(id);
+      const res = await deleteGasto(id, ownerId);
       if (res.success) {
         toast.success(res.message);
       } else {
@@ -104,19 +104,21 @@ const ExpenseTable = ({ gastos, onEdit, onViewClick }: { gastos: Gasto[]; onEdit
                       </svg>
                     </button>
                   )}
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleDelete(gasto._id); }}
-                    disabled={isPending}
-                    className="icon-btn hover:text-danger disabled:opacity-50"
-                    title="Excluir despesa"
-                    aria-label={`Excluir ${gasto.name}`}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M3 6h18"></path>
-                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                    </svg>
-                  </button>
+                  {canDelete && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDelete(gasto._id); }}
+                      disabled={isPending}
+                      className="icon-btn hover:text-danger disabled:opacity-50"
+                      title="Excluir despesa"
+                      aria-label={`Excluir ${gasto.name}`}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                      </svg>
+                    </button>
+                  )}
                 </div>
               </td>
             </tr>

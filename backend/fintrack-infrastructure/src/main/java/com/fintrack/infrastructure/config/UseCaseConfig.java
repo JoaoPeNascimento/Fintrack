@@ -14,7 +14,13 @@ import com.fintrack.application.fixedexpense.CreateFixedExpense;
 import com.fintrack.application.fixedexpense.DeleteFixedExpense;
 import com.fintrack.application.fixedexpense.ListFixedExpenses;
 import com.fintrack.application.fixedexpense.UpdateFixedExpense;
+import com.fintrack.application.share.ManageShare;
+import com.fintrack.application.share.ShareAccess;
+import com.fintrack.application.share.ShareInvites;
+import com.fintrack.application.share.SharedWithMe;
 import com.fintrack.application.user.SyncAuthenticatedUser;
+import com.fintrack.domain.share.ExpenseShareRepository;
+import com.fintrack.domain.share.ShareTokenGenerator;
 import com.fintrack.domain.card.CardRepository;
 import com.fintrack.domain.expense.ExpenseRepository;
 import com.fintrack.domain.fixedexpense.FixedExpenseRepository;
@@ -107,5 +113,25 @@ public class UseCaseConfig {
     @Bean
     GetMonthlySummary getMonthlySummary(ExpenseRepository expenses) {
         return new GetMonthlySummary(expenses);
+    }
+
+    @Bean
+    ShareAccess shareAccess(ExpenseShareRepository shares) {
+        return new ShareAccess(shares);
+    }
+
+    @Bean
+    ManageShare manageShare(ExpenseShareRepository shares, UserRepository users, ShareTokenGenerator tokens) {
+        return new ManageShare(shares, users, tokens);
+    }
+
+    @Bean
+    ShareInvites shareInvites(ExpenseShareRepository shares, UserRepository users, Clock clock) {
+        return new ShareInvites(shares, users, clock);
+    }
+
+    @Bean
+    SharedWithMe sharedWithMe(ExpenseShareRepository shares, UserRepository users, ShareAccess access) {
+        return new SharedWithMe(shares, users, access);
     }
 }

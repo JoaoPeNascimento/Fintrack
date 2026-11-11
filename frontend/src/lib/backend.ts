@@ -91,6 +91,14 @@ export async function backendFetch<T>(path: string, init: { method?: string; bod
   return callBackend<T>(session.user as BackendUser, path, init);
 }
 
+/**
+ * Prefixo das rotas de gastos, cartões e despesas fixas: vazio para os dados do próprio usuário, ou
+ * `/shared/<ownerId>` para agir sobre os dados que outro usuário compartilhou com ele.
+ */
+export function scopePath(ownerId?: string | null) {
+  return ownerId ? `/shared/${encodeURIComponent(ownerId)}` : '';
+}
+
 export function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
 }

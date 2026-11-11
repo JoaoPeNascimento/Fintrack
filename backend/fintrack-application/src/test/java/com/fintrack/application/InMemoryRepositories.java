@@ -5,11 +5,19 @@ import com.fintrack.domain.card.CardRepository;
 import com.fintrack.domain.expense.Expense;
 import com.fintrack.domain.expense.ExpenseRepository;
 import com.fintrack.domain.expense.MonthlyTotal;
+import com.fintrack.domain.share.ExpenseShare;
+import com.fintrack.domain.share.ExpenseShareRepository;
+import com.fintrack.domain.share.ShareMember;
+import com.fintrack.domain.user.User;
+import com.fintrack.domain.user.UserRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +62,93 @@ public final class InMemoryRepositories {
         @Override
         public boolean deleteByIdAndUser(String id, String userId) {
             return findByIdAndUser(id, userId).map(c -> store.remove(id) != null).orElse(false);
+        }
+    }
+
+    public static class Users implements UserRepository {
+
+        private final Map<String, User> store = new LinkedHashMap<>();
+
+        public User add(String id, String email, String name) {
+            User user = new User(id, email, name, null, User.DEFAULT_PROVIDER);
+            store.put(id, user);
+            return user;
+        }
+
+        @Override
+        public Optional<User> findByEmail(String email) {
+            return store.values().stream().filter(u -> u.email().equals(email)).findFirst();
+        }
+
+        @Override
+        public List<User> findAllByIds(Collection<String> ids) {
+            return ids.stream().map(store::get).filter(Objects::nonNull).toList();
+        }
+
+        @Override
+        public User save(User user) {
+            String id = user.id() != null ? user.id() : UUID.randomUUID().toString();
+            User saved = new User(id, user.email(), user.name(), user.image(), user.provider());
+            store.put(id, saved);
+            return saved;
+        }
+
+        @Override
+        public User findOrRegister(User candidate) {
+            return findByEmail(candidate.email()).orElseGet(() -> save(candidate));
+        }
+    }
+
+    /** Guarda cópias, como o banco: alterações no objeto só valem após {@code save}/{@code addMember}. */
+    public static class Shares implements ExpenseShareRepository {
+
+        private final Map<String, ExpenseShare> byOwner = new LinkedHashMap<>();
+
+        @Override
+        public ExpenseShare save(ExpenseShare share) {
+            ExpenseShare current = byOwner.get(share.ownerId());
+            String id = current != null ? current.id() : UUID.randomUUID().toString();
+            List<ShareMember> members = current != null ? current.members() : List.of();
+            ExpenseShare saved = ExpenseShare.restore(id, share.ownerId(), share.token(), share.permission(),
+                    share.enabled(), members);
+            byOwner.put(share.ownerId(), saved);
+            return copy(saved);
+        }
+
+        @Override
+        public Optional<ExpenseShare> findByOwner(String ownerId) {
+            return Optional.ofNullable(byOwner.get(ownerId)).map(Shares::copy);
+        }
+
+        @Override
+        public Optional<ExpenseShare> findByToken(String token) {
+            return byOwner.values().stream().filter(s -> s.token().equals(token)).findFirst().map(Shares::copy);
+        }
+
+        @Override
+        public List<ExpenseShare> findAllByMember(String userId) {
+            return byOwner.values().stream().filter(s -> s.isMember(userId)).map(Shares::copy).toList();
+        }
+
+        @Override
+        public void addMember(String ownerId, ShareMember member) {
+            ExpenseShare share = byOwner.get(ownerId);
+            if (share != null && !share.isMember(member.userId())) {
+                List<ShareMember> members = new ArrayList<>(share.members());
+                members.add(member);
+                byOwner.put(ownerId, ExpenseShare.restore(share.id(), ownerId, share.token(), share.permission(),
+                        share.enabled(), members));
+            }
+        }
+
+        @Override
+        public boolean removeMember(String ownerId, String userId) {
+            ExpenseShare share = byOwner.get(ownerId);
+            return share != null && share.removeMember(userId);
+        }
+
+        private static ExpenseShare copy(ExpenseShare s) {
+            return ExpenseShare.restore(s.id(), s.ownerId(), s.token(), s.permission(), s.enabled(), s.members());
         }
     }
 

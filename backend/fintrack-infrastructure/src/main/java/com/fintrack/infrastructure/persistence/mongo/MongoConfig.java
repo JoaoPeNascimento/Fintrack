@@ -44,6 +44,9 @@ public class MongoConfig {
         ensureIndex(CardDocument.COLLECTION, new Index().on("userId", Sort.Direction.ASC).on("createdAt", Sort.Direction.DESC));
         ensureIndex(FixedExpenseDocument.COLLECTION, new Index().on("userId", Sort.Direction.ASC).on("createdAt", Sort.Direction.DESC));
         ensureIndex(ExpenseDocument.COLLECTION, new Index().on("userId", Sort.Direction.ASC).on("date", Sort.Direction.DESC));
+        ensureRequiredIndex(ExpenseShareDocument.COLLECTION, new Index().on("ownerId", Sort.Direction.ASC).unique());
+        ensureRequiredIndex(ExpenseShareDocument.COLLECTION, new Index().on("token", Sort.Direction.ASC).unique());
+        ensureIndex(ExpenseShareDocument.COLLECTION, new Index().on("members.userId", Sort.Direction.ASC));
     }
 
     /**

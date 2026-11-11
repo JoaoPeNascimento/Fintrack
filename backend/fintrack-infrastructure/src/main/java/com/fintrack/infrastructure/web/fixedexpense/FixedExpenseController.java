@@ -27,14 +27,14 @@ public class FixedExpenseController {
 
     public record FixedExpenseRequest(String name, String description, BigDecimal value) {
 
-        FixedExpenseDetails toDetails() {
+        public FixedExpenseDetails toDetails() {
             return new FixedExpenseDetails(name, description, value);
         }
     }
 
     public record FixedExpenseResponse(String id, String name, String description, BigDecimal value) {
 
-        static FixedExpenseResponse from(FixedExpense expense) {
+        public static FixedExpenseResponse from(FixedExpense expense) {
             return new FixedExpenseResponse(expense.id(), expense.name(), expense.description(), expense.value());
         }
     }

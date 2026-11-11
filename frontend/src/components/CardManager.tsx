@@ -23,7 +23,7 @@ const colorStyles: Record<CardColor, string> = {
   yellow: 'from-yellow-400 to-yellow-600',
 };
 
-const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => {
+const CardManager = ({ initialCards = [], ownerId }: { initialCards?: CreditCard[]; ownerId?: string }) => {
   const [cards, setCards] = useState<CreditCard[]>(initialCards);
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,7 +58,7 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
     if (!window.confirm("Certeza que deseja excluir este cartão?")) return;
     
     try {
-      const response = await deleteCard(cardId);
+      const response = await deleteCard(cardId, ownerId);
       if (response.success) {
         toast.success(response.message || "Cartão deletado com sucesso.");
         setCards(cards.filter(c => c.id !== cardId));
@@ -101,7 +101,7 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
           closingDay: parseInt(formData.closingDay as string),
           dueDay: parseInt(formData.dueDay as string),
           color: formData.color,
-        });
+        }, ownerId);
 
         if (response.success && response.card) {
           toast.success(response.message || "Cartão atualizado com sucesso!");
@@ -125,7 +125,7 @@ const CardManager = ({ initialCards = [] }: { initialCards?: CreditCard[] }) => 
           closingDay: parseInt(formData.closingDay as string),
           dueDay: parseInt(formData.dueDay as string),
           color: formData.color,
-        });
+        }, ownerId);
 
         if (response.success && response.card) {
           toast.success(response.message || "Cartão salvo com sucesso!");

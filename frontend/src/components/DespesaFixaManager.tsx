@@ -13,7 +13,7 @@ export interface DespesaFixa {
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-const DespesaFixaManager = ({ initialDespesas = [] }: { initialDespesas?: DespesaFixa[] }) => {
+const DespesaFixaManager = ({ initialDespesas = [], ownerId }: { initialDespesas?: DespesaFixa[]; ownerId?: string }) => {
   const [despesas, setDespesas] = useState<DespesaFixa[]>(initialDespesas);
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,7 +46,7 @@ const DespesaFixaManager = ({ initialDespesas = [] }: { initialDespesas?: Despes
     if (!window.confirm("Certeza que deseja excluir esta despesa fixa? Ela deixará de constar nos próximos meses.")) return;
     
     try {
-      const response = await deleteDespesaFixa(id);
+      const response = await deleteDespesaFixa(id, ownerId);
       if (response.success) {
         toast.success(response.message || "Despesa fixa deletada com sucesso.");
         setDespesas(despesas.filter(d => d._id !== id));
@@ -82,6 +82,7 @@ const DespesaFixaManager = ({ initialDespesas = [] }: { initialDespesas?: Despes
     try {
       const formDataObj = new FormData();
       if (editingDespesaId) formDataObj.append('id', editingDespesaId);
+      if (ownerId) formDataObj.append('ownerId', ownerId);
       formDataObj.append('name', formData.name);
       formDataObj.append('value', formData.value);
       if (formData.description) formDataObj.append('description', formData.description);

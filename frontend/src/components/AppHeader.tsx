@@ -4,7 +4,8 @@ import LogoutButton from './LogoutButton';
 import Logo from './Logo';
 
 type AppHeaderProps = {
-  active: 'dashboard' | 'profile';
+  /** 'shared' = visão de um compartilhamento: nenhum item do menu fica destacado. */
+  active: 'dashboard' | 'profile' | 'shared';
   user?: { name?: string | null; image?: string | null };
 };
 
