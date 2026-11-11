@@ -27,14 +27,14 @@ public class CardController {
 
     public record CardRequest(String name, BigDecimal limit, Integer closingDay, Integer dueDay, String color) {
 
-        CardDetails toDetails() {
+        public CardDetails toDetails() {
             return new CardDetails(name, limit, closingDay, dueDay, color);
         }
     }
 
     public record CardResponse(String id, String name, BigDecimal limit, int closingDay, int dueDay, String color) {
 
-        static CardResponse from(Card card) {
+        public static CardResponse from(Card card) {
             return new CardResponse(card.id(), card.name(), card.limit(), card.closingDay(), card.dueDay(), card.color());
         }
     }

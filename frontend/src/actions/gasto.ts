@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { backendFetch, errorMessage } from '@/lib/backend';
+import { backendFetch, errorMessage, scopePath } from '@/lib/backend';
 
 type BackendExpense = {
   id: string;
@@ -39,11 +39,13 @@ function toPlainGasto(g: BackendExpense) {
 function revalidate() {
   revalidatePath('/dashboard');
   revalidatePath('/profile');
+  revalidatePath('/shared/[ownerId]', 'page');
 }
 
 export async function createGasto(_prevState: unknown, formData: FormData) {
   try {
     const id = formData.get('id') as string;
+    const scope = scopePath(formData.get('ownerId') as string | null);
     const installmentsStr = formData.get('installments') as string;
 
     // The backend applies the business rules (installment split, "CARD_<id>" parsing, defaults)
@@ -57,12 +59,12 @@ export async function createGasto(_prevState: unknown, formData: FormData) {
     };
 
     if (id) {
-      await backendFetch(`/expenses/${encodeURIComponent(id)}`, { method: 'PUT', body });
+      await backendFetch(`${scope}/expenses/${encodeURIComponent(id)}`, { method: 'PUT', body });
       revalidate();
       return { success: true, message: 'Gasto atualizado com sucesso!' };
     }
 
-    await backendFetch('/expenses', { method: 'POST', body });
+    await backendFetch(`${scope}/expenses`, { method: 'POST', body });
     revalidate();
     return { success: true, message: 'Gasto registrado com sucesso!' };
   } catch (error) {
@@ -70,9 +72,9 @@ export async function createGasto(_prevState: unknown, formData: FormData) {
   }
 }
 
-export async function getUserGastos() {
+export async function getUserGastos(ownerId?: string) {
   try {
-    const gastos = await backendFetch<BackendExpense[]>('/expenses/active');
+    const gastos = await backendFetch<BackendExpense[]>(`${scopePath(ownerId)}/expenses/active`);
     return { success: true, data: gastos.map(toPlainGasto) };
   } catch {
     return { success: false, data: [] };
@@ -97,9 +99,9 @@ export async function getExpensesByMonthAndYear(month: number, year: number) {
   }
 }
 
-export async function deleteGasto(id: string) {
+export async function deleteGasto(id: string, ownerId?: string) {
   try {
-    await backendFetch(`/expenses/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    await backendFetch(`${scopePath(ownerId)}/expenses/${encodeURIComponent(id)}`, { method: 'DELETE' });
 
     revalidate();
 

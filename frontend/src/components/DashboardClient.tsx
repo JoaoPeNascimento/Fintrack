@@ -8,6 +8,7 @@ import FixedExpenseTable from './FixedExpenseTable';
 import { DespesaFixa } from './DespesaFixaManager';
 import GastoModal from './GastoModal';
 import ViewExpenseDetails from './ViewExpenseDetails';
+import { capabilities, type SharePermission } from '@/lib/share';
 
 const DashboardCharts = dynamic(() => import('./DashboardCharts'), { 
   ssr: false, 
@@ -30,7 +31,16 @@ type Card = {
   color?: string;
 };
 
-export default function DashboardClient({ gastos, cards, despesasFixas = [] }: { gastos: Gasto[], cards: Card[], despesasFixas?: DespesaFixa[] }) {
+export default function DashboardClient({ gastos, cards, despesasFixas = [], ownerId, permission, title = 'Visão geral' }: {
+  gastos: Gasto[];
+  cards: Card[];
+  despesasFixas?: DespesaFixa[];
+  /** Dono dos dados quando a visão é de um compartilhamento; ausente para os dados do próprio usuário. */
+  ownerId?: string;
+  permission?: SharePermission;
+  title?: string;
+}) {
+  const { canCreateExpense, canModifyExpense } = capabilities(permission);
   const [editingGasto, setEditingGasto] = useState<Gasto | null>(null);
   const [viewingGasto, setViewingGasto] = useState<Gasto | DespesaFixa | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -84,7 +94,7 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
         <p className="text-sm text-muted mb-5">
           {editingGasto ? 'Altere as informações da sua despesa.' : 'Registre um gasto variável em poucos segundos.'}
         </p>
-        <GastoForm gastoToEdit={editingGasto} onSuccess={handleCloseModal} cards={cards} />
+        <GastoForm gastoToEdit={editingGasto} onSuccess={handleCloseModal} cards={cards} ownerId={ownerId} />
       </GastoModal>
 
       <GastoModal 
@@ -99,12 +109,14 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <p className="eyebrow first-letter:uppercase">{monthLabel}</p>
-          <h1 className="text-2xl font-semibold text-fg tracking-tight mt-1">Visão geral</h1>
+          <h1 className="text-2xl font-semibold text-fg tracking-tight mt-1">{title}</h1>
         </div>
-        <button onClick={handleOpenNew} className="btn btn-accent hidden sm:inline-flex">
-          <PlusIcon className="w-4 h-4" />
-          Nova despesa
-        </button>
+        {canCreateExpense && (
+          <button onClick={handleOpenNew} className="btn btn-accent hidden sm:inline-flex">
+            <PlusIcon className="w-4 h-4" />
+            Nova despesa
+          </button>
+        )}
       </div>
 
       {/* Monthly summary */}
@@ -148,7 +160,13 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
           isOpen={isGastosOpen}
           onToggle={() => setIsGastosOpen(!isGastosOpen)}
         >
-          <ExpenseTable gastos={gastos} onEdit={handleEdit} onViewClick={handleViewClick} />
+          <ExpenseTable
+            gastos={gastos}
+            onEdit={canModifyExpense ? handleEdit : undefined}
+            onViewClick={handleViewClick}
+            canDelete={canModifyExpense}
+            ownerId={ownerId}
+          />
         </AccordionSection>
 
         <AccordionSection
@@ -164,14 +182,16 @@ export default function DashboardClient({ gastos, cards, despesasFixas = [] }: {
       </div>
 
       {/* FAB - mobile only */}
-      <button
-        onClick={handleOpenNew}
-        className="sm:hidden fixed bottom-5 right-5 z-40 btn btn-accent rounded-full h-14 px-5 shadow-lg"
-        aria-label="Adicionar nova despesa"
-      >
-        <PlusIcon className="w-5 h-5" />
-        Nova despesa
-      </button>
+      {canCreateExpense && (
+        <button
+          onClick={handleOpenNew}
+          className="sm:hidden fixed bottom-5 right-5 z-40 btn btn-accent rounded-full h-14 px-5 shadow-lg"
+          aria-label="Adicionar nova despesa"
+        >
+          <PlusIcon className="w-5 h-5" />
+          Nova despesa
+        </button>
+      )}
 
     </div>
   );

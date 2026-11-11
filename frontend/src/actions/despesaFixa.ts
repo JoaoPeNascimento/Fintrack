@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { backendFetch, errorMessage } from '@/lib/backend';
+import { backendFetch, errorMessage, scopePath } from '@/lib/backend';
 
 type BackendFixedExpense = {
   id: string;
@@ -13,11 +13,13 @@ type BackendFixedExpense = {
 function revalidate() {
   revalidatePath('/dashboard');
   revalidatePath('/profile');
+  revalidatePath('/shared/[ownerId]', 'page');
 }
 
 export async function createDespesaFixa(_prevState: unknown, formData: FormData) {
   try {
     const id = formData.get('id') as string;
+    const scope = scopePath(formData.get('ownerId') as string | null);
     const body = {
       name: formData.get('name') as string,
       value: parseFloat(formData.get('value') as string),
@@ -25,12 +27,12 @@ export async function createDespesaFixa(_prevState: unknown, formData: FormData)
     };
 
     if (id) {
-      await backendFetch(`/fixed-expenses/${encodeURIComponent(id)}`, { method: 'PUT', body });
+      await backendFetch(`${scope}/fixed-expenses/${encodeURIComponent(id)}`, { method: 'PUT', body });
       revalidate();
       return { success: true, message: 'Despesa fixa atualizada com sucesso!' };
     }
 
-    await backendFetch('/fixed-expenses', { method: 'POST', body });
+    await backendFetch(`${scope}/fixed-expenses`, { method: 'POST', body });
     revalidate();
     return { success: true, message: 'Despesa fixa registrada com sucesso!' };
   } catch (error) {
@@ -38,9 +40,9 @@ export async function createDespesaFixa(_prevState: unknown, formData: FormData)
   }
 }
 
-export async function getUserDespesasFixas() {
+export async function getUserDespesasFixas(ownerId?: string) {
   try {
-    const items = await backendFetch<BackendFixedExpense[]>('/fixed-expenses');
+    const items = await backendFetch<BackendFixedExpense[]>(`${scopePath(ownerId)}/fixed-expenses`);
 
     const plainItems = items.map((d) => ({
       _id: d.id,
@@ -55,9 +57,9 @@ export async function getUserDespesasFixas() {
   }
 }
 
-export async function deleteDespesaFixa(id: string) {
+export async function deleteDespesaFixa(id: string, ownerId?: string) {
   try {
-    await backendFetch(`/fixed-expenses/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    await backendFetch(`${scopePath(ownerId)}/fixed-expenses/${encodeURIComponent(id)}`, { method: 'DELETE' });
 
     revalidate();
 

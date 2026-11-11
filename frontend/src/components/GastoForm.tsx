@@ -28,7 +28,7 @@ type Card = {
   color?: string;
 };
 
-export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gastoToEdit?: Gasto | null; onSuccess?: () => void; cards?: Card[] } = {}) {
+export default function GastoForm({ gastoToEdit, onSuccess, cards = [], ownerId }: { gastoToEdit?: Gasto | null; onSuccess?: () => void; cards?: Card[]; ownerId?: string } = {}) {
   const [state, formAction, isPending] = useActionState(createGasto, initialState);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -89,6 +89,7 @@ export default function GastoForm({ gastoToEdit, onSuccess, cards = [] }: { gast
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-5">
       {gastoToEdit && <input type="hidden" name="id" value={gastoToEdit._id} />}
+      {ownerId && <input type="hidden" name="ownerId" value={ownerId} />}
 
       <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
         {/* Nome */}

@@ -1,5 +1,6 @@
 package com.fintrack.infrastructure.web;
 
+import com.fintrack.domain.shared.ForbiddenException;
 import com.fintrack.domain.shared.NotFoundException;
 import com.fintrack.domain.shared.ValidationException;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,12 @@ public class ApiExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     ErrorResponse notFound(NotFoundException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    ErrorResponse forbidden(ForbiddenException e) {
         return new ErrorResponse(e.getMessage());
     }
 

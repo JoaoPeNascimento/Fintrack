@@ -40,7 +40,7 @@ public class ExpenseController {
     public record ExpenseRequest(String name, String description, BigDecimal value, LocalDate date,
                                  String paymentMethod, Integer installments, String cardId) {
 
-        ExpenseDetails toDetails() {
+        public ExpenseDetails toDetails() {
             String method = paymentMethod;
             String card = cardId;
             if (method != null && method.startsWith(CARD_PREFIX)) {
@@ -54,7 +54,7 @@ public class ExpenseController {
     public record ExpenseResponse(String id, String name, String description, BigDecimal value, LocalDate date,
                                   PaymentMethod paymentMethod, int installments, String cardId) {
 
-        static ExpenseResponse from(Expense e) {
+        public static ExpenseResponse from(Expense e) {
             return new ExpenseResponse(e.id(), e.name(), e.description(), e.value(), e.date(),
                     e.paymentMethod(), e.installments(), e.cardId());
         }
